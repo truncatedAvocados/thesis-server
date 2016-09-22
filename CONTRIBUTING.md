@@ -16,15 +16,14 @@
   - (cleanup) ...
   - (test) ...
   - (doc) ...
-1. When you've finished with your fix or feature, Rebase upstream changes into your branch. submit a [pull request][]
-   directly to master. Include a description of your changes.
-1. Your pull request will be reviewed by another maintainer. The point of code
-   reviews is to help keep the codebase clean and of high quality and, equally
-   as important, to help you grow as a programmer. If your code reviewer
+1. When you've finished with your fix or feature, `rebase` upstream changes into your branch and submit a pull request directly to master. Include a description of your changes.
+1. Your pull request will be reviewed by another maintainer. If your code reviewer
    requests you make a change you don't understand, ask them why.
 1. Fix any issues raised by your code reviwer, and push your fixes as a single
    new commit.
-1. Once the pull request has been reviewed, it will be merged by another member of the team. Do not merge your own commits.
+1. Once the pull request has been reviewed, it will be merged by another member of the team. **Do not merge your own commits!**
+
+A visual representation of this general workflow can be found [here][workflow diagram].
 
 ## Detailed Workflow
 
@@ -33,12 +32,13 @@
 Use github’s interface to make a fork of the repo, then add that repo as an upstream remote:
 
 ```
-git remote add upstream https://github.com/reactorcore/<NAME_OF_REPO>.git
+git remote add upstream https://github.com/truncatedAvocados/thesis-server.git
 ```
 
 ### Cut a namespaced feature branch from master
 
 Your branch should follow this naming convention:
+
   - bug/...
   - feat/...
   - test/...
@@ -48,7 +48,6 @@ Your branch should follow this naming convention:
 These commands will help you do this:
 
 ``` bash
-
 # Creates your branch and brings you there
 git checkout -b `your-branch-name`
 ```
@@ -56,6 +55,7 @@ git checkout -b `your-branch-name`
 ### Make commits to your feature branch. 
 
 Prefix each commit like so
+
   - (feat) Added a new feature
   - (fix) Fixed inconsistent tests [Fixes #0]
   - (refactor) ...
@@ -71,13 +71,19 @@ changes.
 #### Commit Message Guidelines
 
 - Commit messages should be written in the present tense; e.g. "Fix continuous
-  integration script".
+  integration script". To remember this a properly formed commit message can always be used to complete the following sentence:
+   
+   >"*If applied, this commit will **your commit message***"
+   
 - The first line of your commit message should be a brief summary of what the
   commit changes. Aim for about 70 characters max. Remember: This is a summary,
   not a detailed description of everything that changed.
+  
 - If you want to explain the commit in more depth, following the first line should
   be a blank line and then a more detailed description of the commit. This can be
   as detailed as you want, so dig into details here and keep the first line short.
+
+A more extensive guide to commit messages can be found [here][Git commit].
 
 ### Rebase upstream changes into your branch
 
@@ -141,13 +147,13 @@ Thanks for contributing!
 ### Guidelines
 
 1. Uphold the current code standard:
-    - Keep your code [DRY][].
-    - Apply the [boy scout rule][].
+    - Keep your code [DRY].
+    - Apply the [boy scout rule].
     - Follow [STYLE-GUIDE.md](STYLE-GUIDE.md)
-1. Run the [tests][] before submitting a pull request.
+1. Run the [tests] before submitting a pull request.
 1. Tests are very, very important. Submit tests if your pull request contains
    new, testable behavior.
-1. Your pull request is comprised of a single ([squashed][]) commit.
+1. Your pull request is comprised of a single ([Squash]) commit.
 
 ## Checklist:
 
@@ -169,13 +175,11 @@ no problem getting your changes merged in.
 
 <!-- Links -->
 [style guide]: https://github.com/reactorcore/style-guide
-[n-queens]: https://github.com/reactorcore/n-queens
-[Underbar]: https://github.com/reactorcore/underbar
-[curriculum workflow diagram]: http://i.imgur.com/p0e4tQK.png
-[cons of merge]: https://f.cloud.github.com/assets/1577682/1458274/1391ac28-435e-11e3-88b6-69c85029c978.png
-[Bookstrap]: https://github.com/hackreactor/bookstrap
-[Taser]: https://github.com/hackreactor/bookstrap
-[tools workflow diagram]: http://i.imgur.com/kzlrDj7.png
+[workflow diagram]: http://i.imgur.com/p0e4tQK.png
+[tests]: http://
+[Git commit]: http://chris.beams.io/posts/git-commit/
 [Git Flow]: http://nvie.com/posts/a-successful-git-branching-model/
 [GitHub Flow]: http://scottchacon.com/2011/08/31/github-flow.html
 [Squash]: http://gitready.com/advanced/2009/02/10/squashing-commits-with-rebase.html
+[Dry]: https://en.wikipedia.org/wiki/Don%27t_repeat_yourself
+[boy scout rule]: http://programmer.97things.oreilly.com/wiki/index.php/The_Boy_Scout_Rule
