@@ -29,3 +29,4 @@ class PostCrawler {
 
 }
 
+module.exports = PostCrawler;
