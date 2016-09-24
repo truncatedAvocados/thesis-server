@@ -6,13 +6,12 @@ var connectionString = process.env.DATABASE_URL || 'postgres://localhost:5432/te
 
 var sequelize = new Sequelize(connectionString);
 
-// var client = new pg.Client(connectionString);
-// client.connect();
-// var query = client.query('CREATE TABLE items(id SERIAL PRIMARY KEY, text VARCHAR(40) not null, complete BOOLEAN)');
-// query.on('end', function() { client.end(); });
+sequelize.on('connection', function(message) {
+
+});
 
 
-var Post = sequelize.define('post', {
+exports.Post = sequelize.define('post', {
   url: {
     type: Sequelize.STRING,
     unique: true,
@@ -31,7 +30,14 @@ var Post = sequelize.define('post', {
 
 });
 
+exports.Edges = sequelize.define('edges', {
+
+  from: {
+    type: Sequelize.INTEGER
+  },
+  to: {
+    type: Sequelize.INTEGER
+  }
+});
+
 sequelize.sync();
-
-
-module.exports = Post;
