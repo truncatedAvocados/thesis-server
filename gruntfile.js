@@ -20,7 +20,7 @@ module.exports = (grunt) => {
   });
 
   grunt.registerTask('integration', () => {
-    grunt.task.run(['karma']);
+//  grunt.task.run(['karma']);
   });
 
   grunt.registerTask('converage', () => {
