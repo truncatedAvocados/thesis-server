@@ -20,7 +20,7 @@ describe('PostCrawler Tests', () => {
   });
 
   it('Get post title', () => {
-    if (crawler.getTitle().length > 0) {
+    if (crawler.getTitle().length === 0) {
       assert.ok(false);
     } else {
       assert.ok(true);
