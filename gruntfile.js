@@ -11,6 +11,10 @@ module.exports = (grunt) => {
   grunt.loadNpmTasks('grunt-karma');
   grunt.loadNpmTasks('grunt-mocha-test');
 
+  grunt.registerTask('build', () => {
+
+  });
+
   grunt.registerTask('unit', () => {
     grunt.task.run(['mochaTest']);
   });
