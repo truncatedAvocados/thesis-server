@@ -27,6 +27,12 @@ class PostCrawler {
     });
   }
 
+  html() {
+    if (this.$ === null) {
+      return null;
+    }
+    return this.$.html();
+  }
 }
 
 module.exports = PostCrawler;
