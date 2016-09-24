@@ -1,0 +1,10 @@
+# Folders
+node_modules/
+
+# Vim Files
+*~
+*.swp
+*.swo
+
+# Log files
+*.log

@@ -1,0 +1,41 @@
+{
+  "name": "thesis-server",
+  "version": "1.0.0",
+  "description": "> Pithy project description",
+  "main": "index.js",
+  "scripts": {
+    "test": "grunt unit && grunt integration && grunt converage && grunt end-to-end"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/truncatedAvocados/thesis-server.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/truncatedAvocados/thesis-server/issues"
+  },
+  "homepage": "https://github.com/truncatedAvocados/thesis-server#readme",
+  "dependencies": {
+    "cheerio": "^0.22.0",
+    "request": "^2.75.0"
+  },
+  "devDependencies": {
+    "assert": "^1.4.1",
+    "casper": "^0.1.1",
+    "chai": "^3.5.0",
+    "grunt": "^1.0.1",
+    "grunt-cli": "^1.2.0",
+    "grunt-karma": "^2.0.0",
+    "grunt-mocha": "^1.0.2",
+    "grunt-mocha-test": "^0.13.2",
+    "istanbul": "^0.4.5",
+    "jasmine": "^2.5.2",
+    "jasmine-node": "^1.14.5",
+    "karma": "^1.3.0",
+    "karma-jasmine": "^1.0.2",
+    "karma-mocha": "^1.1.1",
+    "mocha": "^3.0.2",
+    "sinon": "^1.17.6"
+  }
+}
