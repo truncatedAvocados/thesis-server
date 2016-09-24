@@ -23,6 +23,8 @@ class PostCrawler {
       }
 
       this.$ = cheerio.load(body);
+      this.setTitle();
+
       cb(null, this.$);
     });
   }
@@ -32,6 +34,14 @@ class PostCrawler {
       return null;
     }
     return this.$.html();
+  }
+
+  getTitle() {
+    return this.postInfo.title;
+  }
+
+  setTitle() {
+    this.postInfo.title = this.$('head > title').text();
   }
 }
 
