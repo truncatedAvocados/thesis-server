@@ -4,7 +4,7 @@
   "description": "> Pithy project description",
   "main": "index.js",
   "scripts": {
-    "test": "grunt test"
+    "test": "grunt unit && grunt integration && grunt converage && grunt end-to-end"
   },
   "repository": {
     "type": "git",
