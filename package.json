@@ -17,11 +17,13 @@
   },
   "homepage": "https://github.com/truncatedAvocados/thesis-server#readme",
   "dependencies": {
+    "bluebird": "^3.4.6",
     "cheerio": "^0.22.0",
-    "request": "^2.75.0",
+    "grunt": "^1.0.1",
+    "grunt-contrib-clean": "^1.0.0",
     "pg": "^6.1.0",
-    "sequelize": "^3.24.3",
-    "bluebird": "^3.4.6"
+    "request": "^2.75.0",
+    "sequelize": "^3.24.3"
   },
   "devDependencies": {
     "assert": "^1.4.1",
@@ -41,3 +43,4 @@
     "mocha": "^3.0.2",
     "sinon": "^1.17.6"
   }
+}

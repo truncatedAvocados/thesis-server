@@ -1,19 +1,22 @@
-var Post = require('../database').Post;
-var Edges = require('../database').Edges;
+var db = require('../database');
+var Post = db.Post;
+var Edges = db.Edges;
 var Promise = require('bluebird');
 
 exports.createOne = function(postData, cb) {
-
+  
   Post.findOrCreate({
-    url: postData.url,
-    title: postData.title,
-    keys: postData.tags,
-    description: postData.description
+    where: {
+      url: postData.url,
+      title: postData.title,
+      keys: postData.tags,
+      description: postData.description      
+    }
   }).then(function(success) {
     //console.log(success);
     cb(null, success);
   }).catch(function(err) {
-    //console.log(err);
+    console.log(err);
     cb(err);
   });
 
@@ -49,6 +52,7 @@ exports.createOneWithEdge = function(postData, currUrl, cb) {
   }).then(function(updated) {
     cb(null, updated, postToLink);
   }).catch(function(err) {
+    console.log(err);
     cb(err);
   });
 

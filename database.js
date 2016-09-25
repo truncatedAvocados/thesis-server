@@ -1,14 +1,8 @@
-//DB creation
-
 var pg = require('pg');
 var Sequelize = require('sequelize');
 var connectionString = process.env.DATABASE_URL || 'postgres://localhost:5432/testgraph';
 
 var sequelize = new Sequelize(connectionString);
-
-sequelize.on('connection', function(message) {
-
-});
 
 
 exports.Post = sequelize.define('post', {
