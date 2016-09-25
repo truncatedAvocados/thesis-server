@@ -32,7 +32,6 @@ describe('PostCrawler Tests', () => {
           assert.ok(true);
         }
       });
-      
-      });
+    });
   });
 });
