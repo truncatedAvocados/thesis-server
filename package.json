@@ -1,7 +1,7 @@
 {
   "name": "thesis-server",
   "version": "1.0.0",
-  "description": "> Pithy project description",
+  "description": "Server and services for BlogRank thesis project",
   "main": "index.js",
   "scripts": {
     "test": "grunt unit && grunt integration && grunt converage && grunt end-to-end"
@@ -27,7 +27,6 @@
   },
   "devDependencies": {
     "assert": "^1.4.1",
-    "casper": "^0.1.1",
     "chai": "^3.5.0",
     "grunt": "^1.0.1",
     "grunt-cli": "^1.2.0",
