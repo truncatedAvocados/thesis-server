@@ -19,34 +19,34 @@ module.exports = {
 				if (err) {
 					console.log(err);
 				} else {
-					var regUrl = frontPageUrl.slice(regex.exec(frontPageUrl)[0].length);
+					var regUrl = frontPageUrl.replace(regex, '');
 					var $ = cheerio.load(html);
-					console.log('Before: ', Object.keys($('a')).length);
 					filters.forEach((filter) => {
 						$(filter).empty();
 					});
-					console.log('After: ', Object.keys($('a')).length);
 					var anchors = $('a');
 					for (var key in anchors) {
 						if (anchors[key].attribs) {
 							var blogPostUrl = anchors[key].attribs.href;
-							if (blogPostUrl && !added[blogPostUrl]) {
-								var regBlogUrl = regex.exec(blogPostUrl) ? blogPostUrl.slice(regex.exec(blogPostUrl)[0].length) : blogPostUrl;
-								console.log('BLOG: ', regBlogUrl);
-								console.log('FRONT: ', regUrl);
-								//console.log(regBlogUrl.slice(0, regUrl.length) + ' ' + regUrl);
-								if (regBlogUrl.slice(0, regUrl.length) === regUrl) {
-									added[blogPostUrl] = true;
-									result.push(blogPostUrl);
+							if (blogPostUrl) {
+								if (blogPostUrl[0] === '/') {
+									blogPostUrl = frontPageUrl + blogPostUrl;
+								}
+								if (!added[blogPostUrl]) {								
+									var regBlogUrl = blogPostUrl.replace(regex, '');
+									if (regBlogUrl.slice(0, regUrl.length) === regUrl) {
+										added[blogPostUrl] = true;
+										result.push(blogPostUrl);
+									}
 								}
 							}
 						}
 					}
 				}
-				// console.log('New Links: ', result.length - resultCount);
-				// console.log('Total Links: ', result.length);
-				// console.log('Time: ', new Date().getTime() - startTime);
-				// console.log('URL: ', frontPageUrl);
+				console.log('New Links: ', result.length - resultCount);
+				console.log('Total Links: ', result.length);
+				console.log('Time: ', new Date().getTime() - startTime);
+				console.log('URL: ', frontPageUrl);
 				resultCount = result.length;
 				if (urlList[count + 1]) {
 					addPosts(count + 1);
