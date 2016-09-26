@@ -27,7 +27,9 @@
     "natural": "^0.4.0",
     "request": "^2.75.0",
     "stopword": "^0.1.1",
-    "stopwords": "0.0.5"
+    "stopwords": "0.0.5",
+    "cluster": "^0.7.7",
+    "os": "^0.1.1"
   },
   "devDependencies": {
     "assert": "^1.4.1",
