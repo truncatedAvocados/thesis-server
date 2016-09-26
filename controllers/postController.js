@@ -53,15 +53,17 @@ exports.createOneWithEdge = function(postData, currUrl, cb) {
         //We don't want to add the same ID more than once, otherwise the validity of our ranking algorithm becomes diluted
         //This is an edge case, just in case the post being linked has already been linked
         var temp = linkee.inLinks ? linkee.inLinks.slice() : [];
-        console.log(temp);
         if (temp.includes(postToLink.postId)) {
-          cb(null, linkee, postToLink);          
+
+          cb(null, linkee, postToLink);   
+                 
         } else {
+
           temp.push(postToLink.postId);
-          console.log(temp);
           return linkee.updateAttributes({
             inLinks: temp
-          });   
+          });
+
         }    
 
       }).then(function(updated) {

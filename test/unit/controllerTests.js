@@ -88,23 +88,27 @@ describe('Controllers', function() {
 
     });
 
-    // it('should be able to find an existing post and add an edge', function(done) {
+    it('should be able to find an existing post and add an edge', function(done) {
 
-    //   var currUrl = 'http://www.google.com';
-    //   var newEdgePost = {
-    //     url: 'http://www.blogger1.com/post80',
-    //     title: 'Working with Google Analytics',
-    //     keys: ['google', 'analytics', 'coding'],
-    //     description: 'How to make the most of this powerful tool'
-    //   };
+      var currUrl = 'http://www.google.com';
+      var newEdgePost = {
+        url: 'http://www.blogger4.com/post2',
+        title: 'Google Analytics - sehr schon',
+        keys: ['google', 'analytics', 'deutsch'],
+        description: 'Ich brauchte suchen uber das Google search'
+      };
 
-    //   postController.createOneWithEdge(newEdgePost, currUrl, function(err, success) {
+      postController.createOneWithEdge(newEdgePost, currUrl, function(err, updated, postToLink) {
+        expect(err).to.equal(null);
+        expect(updated).to.not.equal(null);
+        expect(postToLink).to.not.equal(null);
 
-    //   });
-
-
-    // });
+        expect(updated.inLinks).to.contain(postToLink.postId);
+        done();
+      });
+    });
   });
+
 
 
   afterEach(function() {
