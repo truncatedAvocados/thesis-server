@@ -1,12 +1,12 @@
-# Project Name
+# Blog Rank
 
-> Pithy project description
+> A search engine for technical blog posts
 
 ## Team
 
-  - __Product Owner__: teamMember
-  - __Scrum Master__: teamMember
-  - __Development Team Members__: teamMember, teamMember
+  - __Product Owner__: Amir Bandeali
+  - __Scrum Master__: Nick Olszowy
+  - __Development Team Members__: Amir Bandeali, Nick Olszowy, Pete Herbert
 
 ## Table of Contents
 
@@ -24,11 +24,8 @@
 
 ## Requirements
 
-- Node 0.10.x
-- Redis 2.6.x
-- Postgresql 9.1.x
-- etc
-- etc
+- Node (version)
+- Postgresql (version)
 
 ## Development
 
