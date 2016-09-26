@@ -34,4 +34,5 @@ exports.Edges = sequelize.define('edges', {
   }
 });
 
+//Create the tables if necessary
 sequelize.sync();

@@ -3,20 +3,31 @@ var Post = db.Post;
 var Edges = db.Edges;
 var Promise = require('bluebird');
 
-exports.createOne = function(postData, cb) {
-  
-  Post.findOrCreate({
+exports.findOrCreateOne = function(postData, cb) {
+
+  Post.findOne({
     where: {
       url: postData.url,
-      title: postData.title,
-      keys: postData.tags,
-      description: postData.description      
     }
-  }).then(function(success) {
-    //console.log(success);
-    cb(null, success);
+  }).then(function(found) {
+    // console.log('I found a post: ', found);
+    if (!found) {
+      return Post.create({
+        url: postData.url,
+        title: postData.title,
+        keys: postData.keys,
+        description: postData.description  
+      });
+    } else {
+      cb(null, found);      
+    }
+  }).then(function(created) {
+    // console.log('Here: ', created);
+    if (created) {
+      cb(null, created);    
+    }
   }).catch(function(err) {
-    console.log(err);
+    // console.log(err);
     cb(err);
   });
 
@@ -28,32 +39,42 @@ exports.createOneWithEdge = function(postData, currUrl, cb) {
   //edge pointing towards
   var postToLink;
 
-  Post.findOrCreate({
-    url: postData.url,
-    title: postData.title,
-    keys: postData.tags,
-    description: postData.description
-  }).then(function(success) {
+  this.findOrCreateOne(postData, function(err, success) {
+    if (success) {
 
-    postToLink = success;
-    //Since this function is called once a page has 
-    //already been added, this lookup should always work
-    return Post.findOne({
-      where: {
-        url: currUrl
-      }
-    });
-  }).then(function(linkee) {
-    //
-    return linkee.update({
-      inLinks: linkee.inLinks.push(postToLink.postId)
-    });
+      postToLink = success;
+    
+      //We should know that this post exists, since the web crawler just created it
+      Post.findOne({
+        where: {
+          url: currUrl
+        }
+      }).then(function(linkee) {
+        //We don't want to add the same ID more than once, otherwise the validity of our ranking algorithm becomes diluted
+        //This is an edge case, just in case the post being linked has already been linked
+        var temp = linkee.inLinks ? linkee.inLinks.slice() : [];
+        console.log(temp);
+        if (temp.includes(postToLink.postId)) {
+          cb(null, linkee, postToLink);          
+        } else {
+          temp.push(postToLink.postId);
+          console.log(temp);
+          return linkee.updateAttributes({
+            inLinks: temp
+          });   
+        }    
 
-  }).then(function(updated) {
-    cb(null, updated, postToLink);
-  }).catch(function(err) {
-    console.log(err);
-    cb(err);
+      }).then(function(updated) {
+        if (updated) {
+          cb(null, updated, postToLink);
+        }
+      }).catch(function(err) {
+        cb(err);
+      });
+
+    } else {
+      cb(err);
+    }
   });
 
 };
