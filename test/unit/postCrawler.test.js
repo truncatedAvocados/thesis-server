@@ -1,13 +1,14 @@
 const assert = require('assert');
 const PostCrawler = require('../../postCrawler');
+const links = require('../data/links').slice(0, 10);
 
 describe('PostCrawler Tests', () => {
-  const urls = [
-    'http://blog.edankwan.com/post/three-js-advanced-tips-shadow',
-    'https://engineering.groupon.com/2016/open-source/codeburner-security-focused-static-code-analysis-for-everyone/'];
   let crawler;
+  let url;
 
-  urls.forEach((url) => {
+  links.forEach((link) => {
+    url = link.url;
+
     describe('Testing ' + url, () => {
       crawler = new PostCrawler(url);
 
