@@ -24,6 +24,7 @@ class PostCrawler {
 
       this.$ = cheerio.load(body);
       this.setTitle();
+      this.setLinks();
 
       cb(null, this.$);
     });
@@ -42,6 +43,23 @@ class PostCrawler {
 
   setTitle() {
     this.postInfo.title = this.$('head > title').text();
+  }
+
+  getLinks() {
+    return this.postInfo.links;
+  }
+
+  setLinks() {
+    // Remove redirects
+    const redirectRegEx = /^\//;
+    let href;
+
+    this.$('#content, #main, .post, .entry').find('a').each((i, elem) => {
+      href = this.$(elem).attr('href');
+      if (!redirectRegEx.test(href)) {
+        this.postInfo.links.push(href);
+      }
+    });
   }
 }
 
