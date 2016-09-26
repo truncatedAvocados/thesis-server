@@ -43,11 +43,11 @@ module.exports = {
 						}
 					}
 				}
-				console.log('New Links: ', result.length - resultCount);
-				console.log('Total Links: ', result.length);
-				console.log('Time: ', new Date().getTime() - startTime);
-				console.log('URL: ', frontPageUrl);
-				resultCount = result.length;
+				// console.log('New Links: ', result.length - resultCount);
+				// console.log('Total Links: ', result.length);
+				// console.log('Time: ', new Date().getTime() - startTime);
+				// console.log('URL: ', frontPageUrl);
+				// resultCount = result.length;
 				if (urlList[count + 1]) {
 					addPosts(count + 1);
 				} else {
@@ -58,20 +58,3 @@ module.exports = {
 		addPosts(0);
 	}
 };
-
-var whiteListKeys = Object.keys(whitelist);
-module.exports.getNewBlogPosts(whiteListKeys, (result) => {
-	console.log(result.length);
-	var toWrite = {};
-	for (var i = 0; i < 500; i++) {
-		toWrite[result[i]] = true;
-	}
-	fs.writeFile('output.json', JSON.stringify(toWrite), (err) => {
-		if (err) {
-			console.log(err);
-		}
-	});
-});
-//'https://infrequently.org/'
-//['http://android-developers.blogspot.com/']
-//other elements/classes to filter out: li? footer
