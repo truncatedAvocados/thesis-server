@@ -45,3 +45,4 @@ frontPageCrawler.getNewBlogPosts(whiteListKeys, (result) => {
 	console.log(new Date().getTime() - startTime);
 	console.log(result.length);
 });
+
