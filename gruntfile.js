@@ -13,6 +13,7 @@ module.exports = (grunt) => {
   grunt.loadNpmTasks('grunt-mocha-test');
 
   grunt.registerTask('build', () => {
+    grunt.task.run(['unit']);
 
   });
 
