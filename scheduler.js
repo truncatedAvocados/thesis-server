@@ -36,5 +36,12 @@ var resToJSON = (array) => {
 	});
 };
 
-var whiteListKeys = Object.keys(whitelist).slice(0, 1);
-frontPageCrawler.getNewBlogPosts(whiteListKeys, scheduleCrawlers);
+var whiteListKeys = Object.keys(whitelist);
+var queue = [];
+var ids = [];
+var startTime = new Date().getTime();
+//frontPageCrawler.getNewBlogPosts(whiteListKeys, scheduleCrawlers);
+frontPageCrawler.getNewBlogPosts(whiteListKeys, (result) => {
+	console.log(new Date().getTime() - startTime);
+	console.log(result.length);
+});
