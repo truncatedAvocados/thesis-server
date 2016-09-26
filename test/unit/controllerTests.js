@@ -34,6 +34,7 @@ describe('Controllers', function() {
         description: 'These guys are pretty awesome, and smart and funny, probably'
       };
       postController.findOrCreateOne(fakePost, function(err, succ) {
+        console.log(err);
         expect(err).to.equal(null);
         expect(succ.dataValues.title).to.equal(fakePost.title);
         expect(succ.keys).to.deep.equal(fakePost.keys);
