@@ -1,6 +1,6 @@
 const assert = require('assert');
 const PostCrawler = require('../../postCrawler');
-const links = require('../data/links').slice(100, 125);
+const links = require('../data/links');
 
 describe('PostCrawler Tests', () => {
   let crawler;
@@ -17,7 +17,7 @@ describe('PostCrawler Tests', () => {
         });
       });
 
-      it('Create PostCrawler instance', () => {
+      xit('Create PostCrawler instance', () => {
         if (crawler.html() === null) {
           assert.ok(false);
         } else {
@@ -25,7 +25,7 @@ describe('PostCrawler Tests', () => {
         }
       });
 
-      it('Get post title', () => {
+      xit('Get post title', () => {
         if (crawler.getTitle().length === 0) {
           assert.ok(false);
         } else {
@@ -33,7 +33,7 @@ describe('PostCrawler Tests', () => {
         }
       });
 
-      it('Get post links', () => {
+      xit('Get post links', () => {
         if (crawler.getLinks().length === 0) {
           assert.ok(false);
         } else {
@@ -41,7 +41,7 @@ describe('PostCrawler Tests', () => {
         }
       });
 
-      it('Get post tags', () => {
+      xit('Get post tags', () => {
         if (crawler.getTags().length === 0) {
           assert.ok(false);
         } else {
@@ -49,14 +49,24 @@ describe('PostCrawler Tests', () => {
         }
       });
 
-      it('Get post author', () => {
+      xit('Get post author', () => {
         if (crawler.getAuthor().length === 0) {
           assert.ok(false);
         } else {
           assert.ok(true);
-          console.log(crawler.getAuthor());
         }
       });
+
+      it('Get post date', () => {
+        const date = crawler.getDate();
+        if (date === null && date !== 'Invalid Date') {
+          assert.ok(false);
+        } else {
+          assert.ok(true);
+        }
+      });
+
+
     });
   });
 });
