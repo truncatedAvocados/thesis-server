@@ -1,6 +1,5 @@
 var expect = require('chai').expect;
 var postController = require('../../controllers/postController');
-var db = require('../../database.js');
 
 
 describe('Controllers', function() {
