@@ -13,6 +13,7 @@ exports.findTags = function(req, res) {
       }
     }
   }).then(function(results) {
+    results.sort((a, b) => b.inLinks.length - a.inLinks.length);
     res.json(results);
   }).catch(function(err) {
     console.log('Error in find tags: ', err);

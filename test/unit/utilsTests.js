@@ -101,8 +101,42 @@ describe('Utilities', function() {
         done();
       });
     });
+
+    it('should add more edges in Web Crawler BFS manner', function(done) {
+
+      var currUrl = 'http://www.blogger4.com/post2';
+      var newEdgePost = {
+        url: 'http://www.blogger1.com/post45',
+        title: 'Some German coding knowledge',
+        keys: ['coding', 'deutsch'],
+        description: 'Something I found really useful',
+        author: 'Blah blah'
+      };
+
+      postUtil.createOneWithEdge(newEdgePost, currUrl, function(err, updated, postToLink) {
+        expect(err).to.equal(null);
+        expect(updated).to.not.equal(null);
+        expect(postToLink).to.not.equal(null);
+
+        expect(updated.inLinks).to.contain(postToLink.postId);
+        done();
+      });
+    });
   });
 
+  describe('Whitelist Utilities', function() {
+
+    it('should also have several different methods', function() {
+      var modules = [
+        'findAll',
+        'addOne'
+      ];
+      modules.forEach(function(module) {
+        expect(wlController[module]).to.be.a.function;    
+      });
+    });
+
+  });
 
 
   afterEach(function() {
