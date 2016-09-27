@@ -4,7 +4,9 @@ module.exports = (grunt) => {
     pkg: grunt.file.readJSON('package.json'),
     mochaTest: {
       test: {
-        src: ['test/unit/*.js'] } },
+        src: ['test/unit/utilsTests.js',
+              'test/unit/controllerTests.js',
+              'test/unit/**/*.js'] } },
     karma: {
       unit: {
         configFile: 'karma.conf.js' } } });
