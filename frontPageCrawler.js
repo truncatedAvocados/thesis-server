@@ -65,7 +65,6 @@ module.exports = {
 					} else {
 						process.send({
 							type: 'finish',
-							from: cluster.worker.id,
 							data: result
 						});
 						cluster.worker.kill();
@@ -82,6 +81,52 @@ module.exports = {
 				cluster.worker.kill();
 			}
 		}
+	},
+	getNewBlogPostsSingleThread: (urlList, callback) => {
+		var result = [];			
+		var added = {};
+		var filters = ['header', 'footer', 'aside', 'nav', '.nav', '.navbar'];
+		var regex = /http\w*\:\/\/(www\.)?/i;
+
+		var addPosts = (count) => {
+			var frontPageUrl = urlList[count];
+			request(frontPageUrl, (err, res, html) => {
+				if (err) {
+					console.log(err);
+				} else {
+					var regUrl = frontPageUrl.replace(regex, '');
+					var $ = cheerio.load(html);
+					filters.forEach((filter) => {
+						$(filter).empty();
+					});
+					var anchors = $('a');
+					for (var key in anchors) {
+						if (anchors[key].attribs) {
+							var blogPostUrl = anchors[key].attribs.href;
+							if (blogPostUrl) {
+								if (blogPostUrl[0] === '/') {
+									blogPostUrl = frontPageUrl + blogPostUrl;
+								}
+								if (!added[blogPostUrl]) {								
+									var regBlogUrl = blogPostUrl.replace(regex, '');
+									if (regBlogUrl.slice(0, regUrl.length) === regUrl) {
+										added[blogPostUrl] = true;
+										result.push(blogPostUrl);
+									}
+								}
+							}
+						}
+					}
+				}
+
+				if (urlList[count + 1]) {
+					count ++;
+					addPosts(count);
+				} else {
+					callback(result);
+				}
+			});
+		}
+		addPosts(0);
 	}
 };
-
