@@ -122,7 +122,7 @@ class PostCrawler {
     // Check for author tag
     if (author.length > 0) {
       this.postInfo.author =
-        author.split(' ').filter(word => word.toLowerCase() !== 'by');
+        author.split(' ').filter(word => word.toLowerCase() !== 'by').join(' ');
     // Use the domain name for the author
     } else {
       this.postInfo.author = urlRegEx.exec(this.postInfo.url)[5];
