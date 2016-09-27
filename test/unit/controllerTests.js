@@ -41,7 +41,10 @@ describe('Controllers', function() {
     it('should query for just one post and get its incoming links', function(done) {
 
       http.get('http://localhost:3000/api/posts/1', function(err, resp, body) {
-        //console.log(err, resp, body);
+        response = JSON.parse(resp.body);
+        expect(response).to.have.length(2);
+        expect(response.map(post => post.title)).to.deep.equal(['Working with Google Analytics', 'Google Analytics - sehr schon']);
+        //Any other check to be done here?
         done();
       });
     });

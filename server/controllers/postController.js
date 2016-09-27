@@ -3,6 +3,7 @@ var Post = db.Post;
 var Edges = db.Edges;
 var Promise = require('bluebird');
 
+//Finds one all posts matching a tag, sorting them by inLinks
 exports.findTags = function(req, res) {
 
   Post.findAll({
@@ -17,10 +18,11 @@ exports.findTags = function(req, res) {
     console.log('Error in find tags: ', err);
     res.status(500).send(err);
   });
-  
+
 };
 
 
+//Finds one post, then finds all info for links to it.
 exports.findOne = function(req, res) {
 
   Post.findOne({
@@ -28,9 +30,8 @@ exports.findOne = function(req, res) {
       postId: req.params.number
     }
   }).then(function(result) {
-    //Get all of these infos
 
-    console.log('We found the post: ', result);
+    //Get all of these infos
     var linkedPosts = result.inLinks;
 
     return Promise.all(linkedPosts.map(function(linkId) {
@@ -40,14 +41,17 @@ exports.findOne = function(req, res) {
         }
       });
     }));
-  }).then(function(allStuff) {
-    console.log(allStuff.dataValues);
-    res.send(allStuff);
+
+  }).then(function(inLinks) {
+
+    res.send(inLinks);
+
   }).catch(function(err) {
+
     console.log('Error in findOne: ', err);
     res.status(500).send(err);    
+
   });
-  //Finds one post, then finds all info for links to it.
 
 };
 
