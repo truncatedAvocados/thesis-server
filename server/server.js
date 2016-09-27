@@ -8,7 +8,7 @@ var routes = require('./router');
 var app = express();
 
 // Attach middleware:
-app.use(bodyParser.json()); //Or something similar
+app.use(bodyParser.json());
 app.use(morgan('combined'));
 
 app.use(express.static('./client'));
@@ -19,7 +19,7 @@ app.use(express.static('./client'));
 app.use('/api', routes);
 
 app.get('/', function (req, res) {
-  res.json({ message: 'Welcome to the BlogRanks RESTful API!' });
+  res.json({ message: 'Welcome to the BlogRank RESTful API!' });
 });
 
 module.exports = app;
