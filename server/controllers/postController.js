@@ -44,7 +44,7 @@ exports.findOne = function(req, res) {
     }));
 
   }).then(function(inLinks) {
-
+    inLinks.sort((a, b) => b.inLinks.length - a.inLinks.length);
     res.send(inLinks);
 
   }).catch(function(err) {
