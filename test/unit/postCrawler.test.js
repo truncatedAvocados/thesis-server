@@ -94,6 +94,22 @@ describe('PostCrawler Tests', () => {
         assert.ok(true);
       }
     });
+
+    it('Check getDesc method', () => {
+      if (crawler.getDesc === undefined) {
+        assert.ok(false);
+      } else {
+        assert.ok(true);
+      }
+    });
+
+    it('Check setDesc method', () => {
+      if (crawler.setDesc === undefined) {
+        assert.ok(false);
+      } else {
+        assert.ok(true);
+      }
+    });
   });
 
   describe('Test methods', () => {
@@ -152,6 +168,15 @@ describe('PostCrawler Tests', () => {
         it('Get post date', () => {
           const date = crawler.getDate();
           if (date === null && date !== 'Invalid Date') {
+            assert.ok(false);
+          } else {
+            assert.ok(true);
+          }
+        });
+
+        it('Get post description', () => {
+          const desc = crawler.getDesc();
+          if (desc === null || desc.length === 0) {
             assert.ok(false);
           } else {
             assert.ok(true);
