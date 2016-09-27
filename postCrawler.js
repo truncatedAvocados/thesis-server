@@ -79,6 +79,7 @@ class PostCrawler {
     const TfIdf = natural.TfIdf;
     const tfidf = new TfIdf();
     const anchors = this.$('a[rel=tag]');
+    const punctRegEx = /[.,\/#!$%\^&\*;:{}=\-_`~()]/g;
     let tag;
     let p;
 
@@ -101,12 +102,12 @@ class PostCrawler {
         tfidf.addDocument(p);
       });
 
-      tfidf.listTerms(0).slice(0, 5).forEach((item) => {
-        // Exclude stopwords
-        if (stopwords.indexOf(item.term.toLowerCase()) === -1) {
-          this.postInfo.tags.push(item.term);
-        }
-      });
+      tfidf.listTerms(0)
+        // Exclude stop words
+        .filter(item => stopwords.indexOf(item.term.toLowerCase()) === -1)
+        // Take the top 3 tags
+        .slice(0, 3)
+        .forEach(item => this.postInfo.tags.push(item.term));
     }
   }
 
