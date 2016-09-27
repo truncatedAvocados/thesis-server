@@ -1,4 +1,5 @@
 module.exports = (grunt) => {
+
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
     mochaTest: {
@@ -12,6 +13,7 @@ module.exports = (grunt) => {
   grunt.loadNpmTasks('grunt-mocha-test');
 
   grunt.registerTask('build', () => {
+    grunt.task.run(['unit']);
 
   });
 

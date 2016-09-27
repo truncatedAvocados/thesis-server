@@ -1,5 +1,12 @@
 language: node_js
+services:
+    - postgresql
 node_js:
     - "6"
 install: npm install
-before_script: grunt build
+before_script: 
+    - node database.js & psql -c 'create database testgraph;' -U postgres & grunt build
+notifications:
+  slack: 
+    rooms:
+      - hr46:bSjNxkQB9ai5NmnKnQKyYtCW#truncated-avocados
