@@ -5,7 +5,7 @@ var connectionString = process.env.DATABASE_URL || 'postgres://localhost:5432/te
 var sequelize = new Sequelize(connectionString);
 
 
-exports.Post = sequelize.define('post', {
+exports.Post = sequelize.define('posts', {
   url: {
     type: Sequelize.STRING,
     unique: true,
