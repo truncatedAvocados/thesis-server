@@ -5,6 +5,26 @@ var whitelist = require('./whitelist.json');
 var cluster = require('cluster');
 var numCPUs = require('os').cpus().length;
 
+var getAndCheckUrl = (anchor, baseUrl) => {
+	var regex = /http\w*\:\/\/(www\.)?/i;
+
+	if (anchor.attribs) {
+		var blogPostUrl = anchor.attribs.href;
+		if (blogPostUrl) {
+			if (blogPostUrl[0] === '/') {
+				blogPostUrl = baseUrl + blogPostUrl;
+			}								
+			var regBlogUrl = blogPostUrl.replace(regex, '');
+			var regUrl = baseUrl.replace(regex, ''); 
+			if (regBlogUrl.slice(0, regUrl.length) === regUrl) {
+				return blogPostUrl;
+			} else {
+				return null;
+			}
+		}
+	}
+};
+
 module.exports = {
 	getNewBlogPosts: (urlList, callback) => {
 		if (cluster.isMaster) {
@@ -15,7 +35,9 @@ module.exports = {
 					workers--;
 					result = result.concat(message.data);
 					if (workers === 0) {
-						callback(result);
+						cluster.disconnect(() => {
+							callback(result);
+						})
 					}
 				}
 			};
@@ -26,7 +48,6 @@ module.exports = {
 			var result = [];			
 			var added = {};
 			var filters = ['header', 'footer', 'aside', 'nav', '.nav', '.navbar'];
-			var regex = /http\w*\:\/\/(www\.)?/i;
 
 			var addPosts = (count) => {
 				var frontPageUrl = urlList[count];
@@ -34,27 +55,16 @@ module.exports = {
 					if (err) {
 						console.log(err);
 					} else {
-						var regUrl = frontPageUrl.replace(regex, '');
 						var $ = cheerio.load(html);
 						filters.forEach((filter) => {
 							$(filter).empty();
 						});
 						var anchors = $('a');
 						for (var key in anchors) {
-							if (anchors[key].attribs) {
-								var blogPostUrl = anchors[key].attribs.href;
-								if (blogPostUrl) {
-									if (blogPostUrl[0] === '/') {
-										blogPostUrl = frontPageUrl + blogPostUrl;
-									}
-									if (!added[blogPostUrl]) {								
-										var regBlogUrl = blogPostUrl.replace(regex, '');
-										if (regBlogUrl.slice(0, regUrl.length) === regUrl) {
-											added[blogPostUrl] = true;
-											result.push(blogPostUrl);
-										}
-									}
-								}
+							var blogPostUrl = getAndCheckUrl(anchors[key], frontPageUrl);
+							if (blogPostUrl && !added[blogPostUrl]) {
+								added[blogPostUrl] = true;
+								result.push(blogPostUrl);
 							}
 						}
 					}
@@ -101,20 +111,10 @@ module.exports = {
 					});
 					var anchors = $('a');
 					for (var key in anchors) {
-						if (anchors[key].attribs) {
-							var blogPostUrl = anchors[key].attribs.href;
-							if (blogPostUrl) {
-								if (blogPostUrl[0] === '/') {
-									blogPostUrl = frontPageUrl + blogPostUrl;
-								}
-								if (!added[blogPostUrl]) {								
-									var regBlogUrl = blogPostUrl.replace(regex, '');
-									if (regBlogUrl.slice(0, regUrl.length) === regUrl) {
-										added[blogPostUrl] = true;
-										result.push(blogPostUrl);
-									}
-								}
-							}
+						var blogPostUrl = getAndCheckUrl(anchors[key], frontPageUrl);
+						if (blogPostUrl && !added[blogPostUrl]) {
+							added[blogPostUrl] = true;
+							result.push(blogPostUrl);
 						}
 					}
 				}
@@ -130,3 +130,4 @@ module.exports = {
 		addPosts(0);
 	}
 };
+
