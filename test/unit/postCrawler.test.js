@@ -1,11 +1,10 @@
 const assert = require('assert');
 const PostCrawler = require('../../postCrawler');
-const links = require('../data/links').slice(0, 100);
+const links = require('../data/links').slice(100, 120);
 
 describe('PostCrawler Tests', () => {
   let crawler;
   let url;
-
   links.forEach((link) => {
     url = link.url;
 
@@ -36,6 +35,14 @@ describe('PostCrawler Tests', () => {
 
       it('Get post links', () => {
         if (crawler.getLinks().length === 0) {
+          assert.ok(false);
+        } else {
+          assert.ok(true);
+        }
+      });
+
+      it('Get post tags', () => {
+        if (crawler.getTags().length === 0) {
           assert.ok(false);
         } else {
           assert.ok(true);
