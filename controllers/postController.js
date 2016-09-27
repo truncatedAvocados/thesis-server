@@ -16,7 +16,8 @@ exports.findOrCreateOne = function(postData, cb) {
         url: postData.url,
         title: postData.title,
         keys: postData.keys,
-        description: postData.description  
+        description: postData.description,
+        author: postData.author
       });
     } else {
       cb(null, found);      
@@ -75,6 +76,7 @@ exports.createOneWithEdge = function(postData, currUrl, cb) {
       });
 
     } else {
+      console.log(err);
       cb(err);
     }
   });

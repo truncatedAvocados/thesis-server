@@ -20,8 +20,8 @@ exports.Post = sequelize.define('post', {
   inLinks: Sequelize.ARRAY(Sequelize.INTEGER),
   title: Sequelize.TEXT,
   description: Sequelize.TEXT,
-  keys: Sequelize.ARRAY(Sequelize.TEXT)
-
+  keys: Sequelize.ARRAY(Sequelize.TEXT),
+  author: Sequelize.STRING
 });
 
 exports.Edges = sequelize.define('edges', {
@@ -35,4 +35,7 @@ exports.Edges = sequelize.define('edges', {
 });
 
 //Create the tables if necessary
+//use {force: true} in sync() to drop tables first if neccessary 
+//Ex: making a schema change by adding an author field
+//Only run this file once (cmd-B in sublime w/ node build).
 sequelize.sync();

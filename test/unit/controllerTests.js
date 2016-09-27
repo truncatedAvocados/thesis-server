@@ -31,7 +31,8 @@ describe('Controllers', function() {
         url: 'http://www.google.com',
         title: 'This is Gooooogle',
         keys: ['search', 'ultimate', 'coding', 'prowess'],
-        description: 'These guys are pretty awesome, and smart and funny, probably'
+        description: 'These guys are pretty awesome, and smart and funny, probably',
+        author: 'Mr. Bean'
       };
       postController.findOrCreateOne(fakePost, function(err, succ) {
         console.log(err);
@@ -49,7 +50,8 @@ describe('Controllers', function() {
         url: 'http://www.blogger1.com/post80',
         title: 'Working with Google Analytics',
         keys: ['google', 'analytics', 'coding'],
-        description: 'How to make the most of this powerful tool'
+        description: 'How to make the most of this powerful tool',
+        author: 'Dood Man'
       };
 
       postController.createOneWithEdge(newEdgePost, currUrl, function(err, updated, postToLink) {
@@ -71,7 +73,8 @@ describe('Controllers', function() {
         url: 'http://www.blogger1.com/post80',
         title: 'Working with Google Analytics',
         keys: ['google', 'analytics', 'coding'],
-        description: 'How to make the most of this powerful tool'
+        description: 'How to make the most of this powerful tool',
+        author: 'Dood Man'
       };
 
       postController.createOneWithEdge(sameEdgePost, currUrl, function(err, updated, postToLink) {
@@ -96,7 +99,8 @@ describe('Controllers', function() {
         url: 'http://www.blogger4.com/post2',
         title: 'Google Analytics - sehr schon',
         keys: ['google', 'analytics', 'deutsch'],
-        description: 'Ich brauchte suchen uber das Google search'
+        description: 'Ich brauchte suchen uber das Google search',
+        author: 'Klaus Jurgenausfallen'
       };
 
       postController.createOneWithEdge(newEdgePost, currUrl, function(err, updated, postToLink) {
