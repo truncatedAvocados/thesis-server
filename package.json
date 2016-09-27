@@ -2,8 +2,9 @@
   "name": "thesis-server",
   "version": "1.0.0",
   "description": "Server and services for BlogRank thesis project",
-  "main": "index.js",
+  "main": "server/index.js",
   "scripts": {
+    "start": "node server/index.js",
     "test": "grunt unit && grunt integration && grunt converage && grunt end-to-end"
   },
   "repository": {
@@ -18,9 +19,12 @@
   "homepage": "https://github.com/truncatedAvocados/thesis-server#readme",
   "dependencies": {
     "bluebird": "^3.4.6",
+    "body-parser": "^1.15.2",
     "cheerio": "^0.22.0",
+    "express": "^4.14.0",
     "grunt": "^1.0.1",
     "grunt-contrib-clean": "^1.0.0",
+    "morgan": "^1.7.0",
     "pg": "^6.1.0",
     "request": "^2.75.0",
     "sequelize": "^3.24.3",

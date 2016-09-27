@@ -1,4 +1,4 @@
-var db = require('../database');
+var db = require('../../db/database');
 var Post = db.Post;
 var Edges = db.Edges;
 var Promise = require('bluebird');

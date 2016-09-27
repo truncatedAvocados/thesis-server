@@ -1,7 +1,6 @@
 var expect = require('chai').expect;
 var postController = require('../../controllers/postController');
 
-
 describe('Controllers', function() {
 
   beforeEach(function() {
