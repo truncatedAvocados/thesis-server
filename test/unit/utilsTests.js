@@ -31,7 +31,6 @@ describe('Utilities', function() {
         author: 'Mr. Bean'
       };
       postUtil.findOrCreateOne(fakePost, function(err, succ) {
-        console.log(err);
         expect(err).to.equal(null);
         expect(succ.dataValues.title).to.equal(fakePost.title);
         expect(succ.keys).to.deep.equal(fakePost.keys);
@@ -56,8 +55,6 @@ describe('Utilities', function() {
         expect(postToLink).to.not.equal(null);
 
         expect(updated.inLinks).to.contain(postToLink.postId);
-
-        console.log('The Updated links array:', updated.inLinks);
         done();
       });
     });
@@ -77,11 +74,7 @@ describe('Utilities', function() {
         expect(err).to.equal(null);
         expect(updated).to.not.equal(null);
         expect(postToLink).to.not.equal(null);
-
-
         expect(updated.inLinks.filter(entry => entry === postToLink.postId)).to.have.length(1);
-
-        console.log('The Updated links array:', updated.inLinks);
         done();
       });
 

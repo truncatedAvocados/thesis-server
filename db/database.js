@@ -2,7 +2,7 @@ var pg = require('pg');
 var Sequelize = require('sequelize');
 var connectionString = process.env.DATABASE_URL || 'postgres://localhost:5432/testgraph';
 
-var sequelize = new Sequelize(connectionString);
+var sequelize = new Sequelize(connectionString, {logging: false});
 
 
 exports.Post = sequelize.define('post', {
@@ -17,10 +17,16 @@ exports.Post = sequelize.define('post', {
     unique: true,
     autoIncrement: true
   },
-  inLinks: Sequelize.ARRAY(Sequelize.INTEGER),
+  inLinks: {
+    type: Sequelize.ARRAY(Sequelize.INTEGER),
+    defaultValue: []
+  },
   title: Sequelize.TEXT,
   description: Sequelize.TEXT,
-  keys: Sequelize.ARRAY(Sequelize.TEXT),
+  keys: {
+    type: Sequelize.ARRAY(Sequelize.TEXT),
+    defaultValue: []
+  },
   author: Sequelize.STRING,
   publishDate: Sequelize.DATE
 });

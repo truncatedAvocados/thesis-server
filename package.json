@@ -5,6 +5,7 @@
   "main": "server/index.js",
   "scripts": {
     "start": "node server/index.js",
+    "start:dev": "nodemon server/index.js",
     "test": "grunt unit && grunt integration && grunt converage && grunt end-to-end"
   },
   "repository": {
@@ -22,9 +23,11 @@
     "body-parser": "^1.15.2",
     "cheerio": "^0.22.0",
     "express": "^4.14.0",
+    "express-limiter": "^1.6.0",
     "grunt": "^1.0.1",
     "grunt-contrib-clean": "^1.0.0",
     "morgan": "^1.7.0",
+    "nodemon": "^1.10.2",
     "pg": "^6.1.0",
     "request": "^2.75.0",
     "sequelize": "^3.24.3",

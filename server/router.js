@@ -1,25 +1,15 @@
 var router = require('express').Router();
 var postController = require('./controllers/postController');
 
-// Create route handlers for each of the six methods in postController
-
-// router.route('/:number')
-//   .all(function(req, res, next) {
-//     console.log('In the middleware: ', req.url);
-//     req.number = parseInt(req.url.slice(1));
-//     console.log('this is working: ', req.number, typeof req.number);
-//     next();
-//     //grab the number, put it in the req, and continue
-//     //brb
-//   });
 
 router.get('/posts', function(req, res) {
-  console.log('In the GET query for blog posts route');
+  console.log('In the GET query for blog posts route: ', req.query.tags);
+  req.query.tags = JSON.parse(req.query.tags);
   postController.findTags(req, res);
 });
 
 router.get('/posts/:number', function(req, res) {
-  console.log('In the GET query for individual job posts route');
+  console.log('In the GET query for individual job posts route: ', req.params.number);
   postController.findOne(req, res);
 });
 
@@ -29,8 +19,8 @@ router.get('/authors', function(req, res) {
 });
 
 router.get('/authors/:number', function(req, res) {
-  console.log('In the GET query for an individual author route');
-  postController.retrieveOne(req, res, req.number);
+  console.log('In the GET query for an individual author route: ', req.params.number);
+  postController.retrieveOne(req, res);
 });
 
 module.exports = router;

@@ -12,11 +12,12 @@ exports.findTags = function(req, res) {
       }
     }
   }).then(function(results) {
-
-    res.send(results);
+    res.json(results);
   }).catch(function(err) {
+    console.log('Error in find tags: ', err);
     res.status(500).send(err);
   });
+  
 };
 
 
@@ -24,10 +25,12 @@ exports.findOne = function(req, res) {
 
   Post.findOne({
     where: {
-      url: req.url
+      postId: req.params.number
     }
   }).then(function(result) {
     //Get all of these infos
+
+    console.log('We found the post: ', result);
     var linkedPosts = result.inLinks;
 
     return Promise.all(linkedPosts.map(function(linkId) {
@@ -38,8 +41,11 @@ exports.findOne = function(req, res) {
       });
     }));
   }).then(function(allStuff) {
-    console.log(allStuff);
+    console.log(allStuff.dataValues);
     res.send(allStuff);
+  }).catch(function(err) {
+    console.log('Error in findOne: ', err);
+    res.status(500).send(err);    
   });
   //Finds one post, then finds all info for links to it.
 
