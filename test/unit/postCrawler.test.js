@@ -1,6 +1,6 @@
 const assert = require('assert');
 const PostCrawler = require('../../postCrawler');
-const links = require('../data/links').slice(100, 120);
+const links = require('../data/links').slice(100, 125);
 
 describe('PostCrawler Tests', () => {
   let crawler;
@@ -46,6 +46,15 @@ describe('PostCrawler Tests', () => {
           assert.ok(false);
         } else {
           assert.ok(true);
+        }
+      });
+
+      it('Get post author', () => {
+        if (crawler.getAuthor().length === 0) {
+          assert.ok(false);
+        } else {
+          assert.ok(true);
+          console.log(crawler.getAuthor());
         }
       });
     });
