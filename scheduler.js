@@ -5,11 +5,7 @@ var numCPUs = require('os').cpus().length;
 var cluster = require('cluster');
 
 var scheduleCrawlers = (queue) => {
-	//console.log(queue);
 	if (cluster.isMaster) {
-		var result = [];
-		console.log(cluster.workers);
-		console.log(queue.length);
 		var workers = numCPUs;
 		var messageHandler = (message) => {
 			if (message.type === 'finish') {
@@ -17,25 +13,30 @@ var scheduleCrawlers = (queue) => {
 			}
 		};
 		for (var i = 0; i < workers; i++) {
-			console.log('Forking: ' + i);
 			var worker = cluster.fork();
 		}
 	} else {
 		var startLength = queue.length;
 		var traverseArray = (count) => {
-			console.log(cluster.worker.id + ': ' + queue[count]);
-			var counter = count + numCPUs >= startLength ? count + 1 : count + numCPUs;
-			if (queue[counter]) {
-				traverseArray(counter);
+			var next = count + numCPUs >= startLength ? count + 1 : count + numCPUs;
+			if (queue[next]) {
+				traverseArray(next);
 			} else {
 				cluster.worker.kill();
 			}
 		};
 		var id = cluster.worker.id - 1;
-		console.log('Id: ', id);
 		traverseArray(id);
 	}
 };
+
+// var scheduleCrawlersSingle = (queue) {
+// 	while (queue.length > 0) {
+// 		crawl(queue.shift(), (result) => {
+// 			queue.concat(result);
+// 		});
+// 	}
+// }
 
 
 var resToJSON = (array) => {
@@ -52,7 +53,7 @@ var resToJSON = (array) => {
 
 var whiteListKeys = Object.keys(whitelist).slice(0, 10);
 var startTime = new Date().getTime();
-frontPageCrawler.getNewBlogPostsSingleThread(whiteListKeys, scheduleCrawlers);
+//frontPageCrawler.getNewBlogPostsSingleThread(whiteListKeys, scheduleCrawlers);
 //frontPageCrawler.getNewBlogPosts(whiteListKeys, scheduleCrawlers);
 frontPageCrawler.getNewBlogPosts(whiteListKeys, (result) => {
 	console.log(new Date().getTime() - startTime);
