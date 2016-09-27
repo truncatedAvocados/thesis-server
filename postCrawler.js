@@ -28,6 +28,7 @@ class PostCrawler {
       this.setTitle();
       this.setLinks();
       this.setTags();
+      this.setAuthor();
 
       cb(null, this.$);
     });
@@ -104,6 +105,25 @@ class PostCrawler {
           this.postInfo.tags.push(item.term);
         }
       });
+    }
+  }
+
+  getAuthor() {
+    return this.postInfo.author;
+  }
+
+  setAuthor() {
+    // Remove newline characters and tabs
+    const author = this.$('.author').text().replace(/\r?\n|\r|\t/g, '');
+    const urlRegEx = /^(http(s)?(:\/\/))?(www\.)?([a-zA-Z0-9-_\.]+)/gi;
+
+    // Check for author tag
+    if (author.length > 0) {
+      this.postInfo.author =
+        author.split(' ').filter(word => word.toLowerCase() !== 'by');
+    // Use the domain name for the author
+    } else {
+      this.postInfo.author = urlRegEx.exec(this.postInfo.url)[5];
     }
   }
 }
