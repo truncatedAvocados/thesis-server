@@ -38,4 +38,4 @@ exports.Edges = sequelize.define('edges', {
 //use {force: true} in sync() to drop tables first if neccessary 
 //Ex: making a schema change by adding an author field
 //Only run this file once (cmd-B in sublime w/ node build).
-sequelize.sync({force: true});
+sequelize.sync();
