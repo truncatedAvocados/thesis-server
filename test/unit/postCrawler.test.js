@@ -120,7 +120,7 @@ describe('PostCrawler Tests', () => {
         crawler = new PostCrawler(url);
 
         beforeEach((done) => {
-          crawler.get((err, $) => {
+          crawler.get((err, post) => {
             done();
           });
         });

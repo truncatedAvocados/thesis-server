@@ -34,7 +34,7 @@ class PostCrawler {
       this.setDate();
       this.setDesc();
 
-      cb(null, this.$);
+      cb(null, this.postInfo);
     });
   }
 
