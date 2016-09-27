@@ -13,6 +13,7 @@ class PostCrawler {
       author: null,
       title: null,
       date: null,
+      desc: null,
       url: this.url,
       tags: [],
       links: [] };
@@ -31,6 +32,7 @@ class PostCrawler {
       this.setTags();
       this.setAuthor();
       this.setDate();
+      this.setDesc();
 
       cb(null, this.$);
     });
@@ -138,6 +140,22 @@ class PostCrawler {
     const dateString =
       this.$('.date, .datetime, .post-date, .date-time, time').text();
     this.postInfo.date = new Date(dateString);
+  }
+
+  getDesc() {
+    return this.postInfo.desc;
+  }
+
+  setDesc() {
+    const p =
+      this.$('#content, #main, .post, .entry')
+        .find('p')
+        .first()
+        .text()
+        // Remove newline characters and tabs
+        .replace(/\r?\n|\r|\t/g, '')
+        .trim();
+    this.postInfo.desc = p.slice(0, 97).concat('...');
   }
 }
 
