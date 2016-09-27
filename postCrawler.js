@@ -12,6 +12,7 @@ class PostCrawler {
     this.postInfo = {
       author: null,
       title: null,
+      date: null,
       url: this.url,
       tags: [],
       links: [] };
@@ -29,6 +30,7 @@ class PostCrawler {
       this.setLinks();
       this.setTags();
       this.setAuthor();
+      this.setDate();
 
       cb(null, this.$);
     });
@@ -125,6 +127,16 @@ class PostCrawler {
     } else {
       this.postInfo.author = urlRegEx.exec(this.postInfo.url)[5];
     }
+  }
+
+  getDate() {
+    return this.postInfo.date;
+  }
+
+  setDate() {
+    const dateString =
+      this.$('.date, .datetime, .post-date, .date-time, time').text();
+    this.postInfo.date = new Date(dateString);
   }
 }
 
