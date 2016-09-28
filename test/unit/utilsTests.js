@@ -1,5 +1,8 @@
 var expect = require('chai').expect;
 var postUtil = require('../../workerUtils/postUtils.js');
+var wlUtil = require('../../workerUtils/wlUtils.js');
+var Promise = require('bluebird');
+
 
 describe('Utilities', function() {
 
@@ -132,10 +135,41 @@ describe('Utilities', function() {
         'addOne'
       ];
       modules.forEach(function(module) {
-        expect(wlController[module]).to.be.a.function;    
+        expect(wlUtil[module]).to.be.a.function;    
       });
     });
 
+    it('should be able to add several new entries', function(done) {
+      var frontPages = [
+        'https://oldchevy.github.io', 
+        'http://www.helloreact.com/blog',
+        'http://www.programming.org/blog',
+        'http://www.isaacabrimov.com'
+      ];
+
+      var addOne = Promise.promisify(wlUtil.addOne);
+
+      Promise.all(frontPages.map(page => addOne(page))).then(function(saved) {
+        //console.log('Resolved: ', stuff);
+
+        expect(saved.map(page => page.url)).to.deep.equal(frontPages);
+        done();
+
+      }).catch(function(err) {
+        console.log('Errors: ', err);
+      });
+    });
+
+    it('should get all entries', function(done) {
+
+      wlUtil.findAll(function(err, results) {
+        expect(results.length).to.equal(4);
+        if (!err) {
+          done();
+        }
+      });
+
+    });
   });
 
 

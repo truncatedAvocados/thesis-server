@@ -50,10 +50,29 @@ exports.Edges = sequelize.define('edges', {
 //This table will improve lookup time on tags, and also will be quite necessary when
 //we want to start creating an indexing service. It will allow us to simply iterate through tags,
 //instead of a complex logic when visiting each entry. Additionally it may be useful for data scrubbing purposes
+exports.Tags = sequelize.define('tags', {
+  tag: {
+    type: Sequelize.STRING,
+    unique: true,
+  },
+  blogId: {
+    type: Sequelize.INTEGER,
+    unique: true,
+    primaryKey: true
+  }
 
+});
+
+//Note: needs a many to many join table on post ID
 
 //This table is simply for persisting whitelist data so we know it is stored and safe somewhere.
 //When a web worker instance is started up it will read in this whole table
+exports.WL = sequelize.define('whitelist', {
+  url: {
+    type: Sequelize.STRING,
+    unique: true
+  }
+});
 
 
 //Create the tables if necessary
