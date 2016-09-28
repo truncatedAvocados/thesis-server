@@ -23,7 +23,11 @@
     "grunt-contrib-clean": "^1.0.0",
     "pg": "^6.1.0",
     "request": "^2.75.0",
-    "sequelize": "^3.24.3"
+    "sequelize": "^3.24.3",
+    "natural": "^0.4.0",
+    "request": "^2.75.0",
+    "stopword": "^0.1.1",
+    "stopwords": "0.0.5"
   },
   "devDependencies": {
     "assert": "^1.4.1",
