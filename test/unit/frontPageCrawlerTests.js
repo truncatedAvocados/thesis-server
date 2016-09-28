@@ -1,7 +1,7 @@
 var expect = require('chai').expect;
 var frontPageCrawler = require('../../frontPageCrawler');
-var getNewBlogPostsSingleThread = frontPageCrawler.getNewBlogPostsSingleThread;
-var getNewBlogPosts = frontPageCrawler.getNewBlogPosts;  
+var getPostsMulti = frontPageCrawler.getPostsMulti;
+var getPosts = frontPageCrawler.getPosts;  
 
 describe('frontPageCrawler', function() {
 
@@ -9,19 +9,19 @@ describe('frontPageCrawler', function() {
 
   });
 
-  // describe('getNewBlogPostsMultiThread', function() {
+  // describe('getPostsMulti', function() {
   //   var urlList = ['http://aakinshin.net/en/blog/content/'];
   //   it('should invoke a callback on an array', function(done) {
-  //     getNewBlogPosts(urlList, (result) => {
+  //     getPostsMulti(urlList, (result) => {
   //       expect(result).to.be.an.array;
   //       done();
   //     });
   //   });
 
   //   it('should not add duplicates to the results array', function(done) {
-  //     getNewBlogPosts(urlList, (result) => {
+  //     getPostsMulti(urlList, (result) => {
   //       var startLength = result.length;
-  //       getNewBlogPosts(urlList.concat(urlList), (newResult) => {
+  //       getPostsMulti(urlList.concat(urlList), (newResult) => {
   //         var endLength = newResult.length;
   //         expect(endLength).to.equal(startLength);
   //         done();
@@ -30,26 +30,26 @@ describe('frontPageCrawler', function() {
   //   });
 
   //   it('should keep running if it runs into an error', function(done) {
-  //     getNewBlogPosts(urlList.concat('NOT_A_URL'), (result) => {
+  //     getPostMulti(urlList.concat('NOT_A_URL'), (result) => {
   //       expect(result).to.be.an.array;
   //       done();
   //     })
   //   });
   // });
 
-  describe('getNewBlogPostsSingleThread', function() {
+  describe('getPosts', function() {
     var urlList = ['http://aakinshin.net/en/blog/content/'];
     it('should invoke a callback on an array', function(done) {
-      getNewBlogPostsSingleThread(urlList, (result) => {
+      getPosts(urlList, (result) => {
         expect(result).to.be.an.array;
         done();
       });
     });
 
     it('should not add duplicates to the results array', function(done) {
-      getNewBlogPostsSingleThread(urlList, (result) => {
+      getPosts(urlList, (result) => {
         var startLength = result.length;
-        getNewBlogPostsSingleThread(urlList.concat(urlList), (newResult) => {
+        getPosts(urlList.concat(urlList), (newResult) => {
           var endLength = newResult.length;
           expect(endLength).to.equal(startLength);
           done();
@@ -58,13 +58,13 @@ describe('frontPageCrawler', function() {
     });
 
     it('should keep running if it runs into an error', function(done) {
-      getNewBlogPostsSingleThread(urlList.concat('NOT_A_URL'), (result) => {
+      getPosts(urlList.concat('NOT_A_URL'), (result) => {
         expect(result).to.be.an.array;
         done();
       })
     });
     it('should invoke a callback on an empty array with an invalid input', function(done) {
-      getNewBlogPostsSingleThread([], (result) => {
+      getPosts([], (result) => {
         expect(result.length).to.equal(0);
         done();
       });

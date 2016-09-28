@@ -24,7 +24,7 @@ var getAndCheckUrl = (anchor, baseUrl) => {
 };
 
 module.exports = {
-	getNewBlogPosts: (urlList, callback) => {
+	getPostsMulti: (urlList, callback) => {
 		if (!urlList || urlList.length === 0) {
 			callback([]);
 		} else {
@@ -92,7 +92,7 @@ module.exports = {
 			}
 		}
 	},
-	getNewBlogPostsSingleThread: (urlList, callback) => {
+	getPosts: (urlList, callback) => {
 		if (!urlList || urlList.length === 0) {
 			callback([]);
 		} else {
