@@ -5,7 +5,7 @@ node_js:
     - "6"
 install: npm install
 before_script: 
-    - node database.js & psql -c 'create database testgraph;' -U postgres & grunt build
+    - node server/index.js & node db/database.js & psql -c 'create database testgraph;' -U postgres & grunt build
 notifications:
   slack: 
     rooms:
