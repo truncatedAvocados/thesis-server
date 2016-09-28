@@ -1,6 +1,6 @@
 const assert = require('assert');
 const PostCrawler = require('../../postCrawler');
-const links = require('../data/links').slice(0, 1);
+const links = require('../data/links').slice(100, 110);
 
 describe('PostCrawler Tests', () => {
   let crawler;
