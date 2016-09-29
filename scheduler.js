@@ -68,15 +68,12 @@ module.exports = {
 			});
 		}
 	},
-	scheduleCrawlersSingle: (queue) => {
+	scheduleCrawlersSingle: (queue, cb) => {
 		while (queue.length > 0) {
 			var url = queue.shift();
 			if (baseUrls[getBaseUrl(url)]) {
-				//crawl not yet defined
-				crawl(queue.shift(), (result) => {
-					queue.concat(result);
-				});
-			}
+        cb(url);
+      }
 		}
 	}
 };
