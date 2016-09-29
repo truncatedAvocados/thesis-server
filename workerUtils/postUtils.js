@@ -34,6 +34,16 @@ exports.findOrCreateOne = function(postData, cb) {
 
 };
 
+exports.findUrl = (url, cb) => {
+  Post.findOne({
+    where: {
+      url: url
+    }
+  }).then((found) => {
+    cb(null, found);
+  });
+};
+
 exports.createOneWithEdge = function(postData, currUrl, cb) {
 
   //currUrl is the thing we would like to add an 
