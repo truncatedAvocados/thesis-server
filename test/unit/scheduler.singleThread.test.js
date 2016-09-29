@@ -13,7 +13,7 @@ describe('Single Thread Scheduler Tests', () => {
     });
 
     it('Check scheduler property scheduleCrawlersSingle is a function', () => {
-      if(typeof scheduler !== 'function') {
+      if (typeof scheduler !== 'function') {
         assert.ok(false);
       } else {
         assert.ok(true);
