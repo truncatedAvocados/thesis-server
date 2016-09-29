@@ -1,5 +1,4 @@
 module.exports = (grunt) => {
-
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
     mochaTest: {
@@ -23,7 +22,6 @@ module.exports = (grunt) => {
 
   grunt.registerTask('build', () => {
     grunt.task.run(['unit']);
-
   });
 
   //Todo: concat and minify client files here
@@ -42,7 +40,6 @@ module.exports = (grunt) => {
   grunt.registerTask('converage', () => {
 
   });
-
 
   grunt.registerTask('end-to-end', () => {
 
