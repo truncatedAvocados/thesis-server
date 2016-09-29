@@ -8,33 +8,9 @@ var getBaseUrl = (url) => {
 };
 
 module.exports = {
-	scheduleCrawlersMulti: (queue) => {
+	scheduleCrawlersMulti: (urlList) => {
 		if (cluster.isMaster) {
-			var workers = numCPUs;
-			for (var i = 0; i < workers; i++) {
-				cluster.fork();
-			}
-		} else {
-			var startLength = queue.length;
-			var traverseArray = (count) => {
-				if (baseUrls[getBaseUrl(queue[count])]) {
-					console.log(queue[count]);
-				}
-				var next = count + numCPUs >= startLength ? count + 1 : count + numCPUs;
-				if (queue[next]) {
-					traverseArray(next);
-				} else {
-					cluster.worker.kill();
-				}
-			};
-			var id = cluster.worker.id - 1;
-			traverseArray(id);
-		}
-	},
-	scheduleCrawlersMulti2: (urlList) => {
-		if (cluster.isMaster) {
-			//var workers = numCPUs;
-			var workers = 8;
+			var workers = numCPUs * 2;
 			var urlCount = -1;
 			var childMessageHandler = (message) => {
 				if (message.type = 'finish') {
