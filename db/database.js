@@ -1,8 +1,14 @@
 var pg = require('pg');
 var Sequelize = require('sequelize');
-var connectionString = process.env.DATABASE_URL || 'postgres://localhost:5432/testgraph';
 
-var sequelize = new Sequelize(connectionString, {logging: false});
+//Note: the ternary is for automatic detection of local vs. deployed env.
+//If you want to connect to the RDS from your local server, copy the code I pinned in Slack
+var sequelize = process.env.RDS_DB_NAME
+                  ? new Sequelize(process.env.RDS_DB_NAME, process.env.RDS_USERNAME, process.env.RDS_PASSWORD, {
+                    host: process.env.RDS_HOSTNAME,
+                    dialect: 'postgres'
+                  })
+                  : new Sequelize('postgres://localhost:5432/testgraph', {logging: false});
 
 
 //Our primary table of interest. Importantly, inLinks are defined as the number of
