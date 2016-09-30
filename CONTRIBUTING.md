@@ -25,6 +25,51 @@
 
 A visual representation of this general workflow can be found [here][workflow diagram].
 
+## Using the Production Environment
+
+### Accessing the Amazon RDS
+
+You can SSH into the RDS instance to look at data with SQL commands and psql shortcut commands. To SSH in you must be on the Hack Reactor wi-fi, and you must have the team password. With these conditions met, use this command:
+
+```
+psql --host=truncated-avocados-db.ccmennnvhu6h.us-west-2.rds.amazonaws.com --port=5432 --username=truncados --password --dbname=blog_graph
+```
+
+It may convenient for you to alias this script. To do this just open up your shell configuration file (`~/.zshrc` or `~/.bashrc`) and add the line:
+
+```
+alias awsdb="psql --host=truncated-avocados-db.ccmennnvhu6h.us-west-2.rds.amazonaws.com --port=5432 --username=truncados --password --dbname=blog_graph"
+```
+
+### Accessing the Amazon EC2 instance
+
+If you are a project admin, you can also SSH into the EC2 instance, but first you must have the key-pair file. Once you get this file, be sure to change the permissions such that only you can read it, like this:
+
+```
+chmod 400 truncados-key-pair.pem
+```
+
+Then place the file in a safe place and the command to SSH into the instance is:
+
+```
+ssh -i ~/path/to/file/truncados-key-pair.pem ec2-user@ec2-54-218-115-180.us-west-2.compute.amazonaws.com
+```
+
+You can add this command to your aliases too. Also an easy place to put the file is in a config directory inside the top level of the repo. This folder is ignored by git.
+
+Note: The address above might change depending on which instance you are trying to access
+
+### For Admins: Deploying
+
+Once changes are approved, pulled into the master branch, and tested locally, admins can SSH into the instance and easily deploy with the following commands from within the `thesis-server` repo directory:
+
+```
+git pull origin master
+grunt deploy
+```
+
+That's it! Grunt will take care of starting the server and workers, as well as performing concatenation and minification of client files.
+
 ## Detailed Workflow
 
 ### Fork the repo
