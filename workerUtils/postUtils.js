@@ -15,17 +15,17 @@ exports.findOrCreateOne = function(postData, cb) {
       return Post.create({
         url: postData.url,
         title: postData.title,
-        keys: postData.keys,
-        description: postData.description,
-        author: postData.author
+        keys: postData.tags,
+        description: postData.desc,
+        author: postData.autho
       });
     } else {
-      cb(null, found);      
+      cb(null, found);
     }
   }).then(function(created) {
     // console.log('Here: ', created);
     if (created) {
-      cb(null, created);    
+      cb(null, created);
     }
   }).catch(function(err) {
     // console.log(err);
@@ -46,7 +46,7 @@ exports.findUrl = (url, cb) => {
 
 exports.createOneWithEdge = function(postData, currUrl, cb) {
 
-  //currUrl is the thing we would like to add an 
+  //currUrl is the thing we would like to add an
   //edge pointing towards
   var postToLink;
 
@@ -54,7 +54,7 @@ exports.createOneWithEdge = function(postData, currUrl, cb) {
     if (success) {
 
       postToLink = success;
-    
+
       //We should know that this post exists, since the web crawler just created it
       Post.findOne({
         where: {
@@ -66,8 +66,8 @@ exports.createOneWithEdge = function(postData, currUrl, cb) {
         var temp = linkee.inLinks ? linkee.inLinks.slice() : [];
         if (temp.includes(postToLink.postId)) {
 
-          cb(null, linkee, postToLink);   
-                 
+          cb(null, linkee, postToLink);
+
         } else {
 
           temp.push(postToLink.postId);
@@ -75,7 +75,7 @@ exports.createOneWithEdge = function(postData, currUrl, cb) {
             inLinks: temp
           });
 
-        }    
+        }
 
       }).then(function(updated) {
         if (updated) {

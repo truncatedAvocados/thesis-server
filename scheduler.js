@@ -1,10 +1,10 @@
-var numCPUs = require('os').cpus().length;
-var cluster = require('cluster');
-var baseUrls = require('./baseUrls.json');
+const numCPUs = require('os').cpus().length;
+const cluster = require('cluster');
+const baseUrls = require('./baseUrls.json');
 
-var getBaseUrl = (url) => {
-	var regex = new RegExp("^(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(\\?(?:[^#]*))?(#(‌​?:.*))?");
-	return regex.exec(url)[2];
+const getBaseUrl = (url) => {
+  const regex = new RegExp("^(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(\\?(?:[^#]*))?(#(‌​?:.*))?");
+  return regex.exec(url)[2];
 };
 
 module.exports = {
@@ -68,22 +68,13 @@ module.exports = {
 			});
 		}
 	},
-	scheduleCrawlersSingle: (queue) => {
-		while (queue.length > 0) {
-			var url = queue.shift();
-			if (baseUrls[getBaseUrl(url)]) {
-				//crawl not yet defined
-				crawl(queue.shift(), (result) => {
-					queue.concat(result);
-				});
-			}
-		}
-	}
-};
-
-
-
-
-
-
+  scheduleCrawlersSingle: (queue, cb) => {
+    let url;
+    while (queue.length > 0) {
+      url = queue.shift();
+      if (baseUrls[getBaseUrl(url)]) {
+        cb(url);
+      }
+    }
+  } };
 
