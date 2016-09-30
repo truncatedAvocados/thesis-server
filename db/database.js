@@ -33,7 +33,7 @@ exports.Post = sequelize.define('post', {
   },
   title: Sequelize.TEXT,
   description: Sequelize.TEXT,
-  keys: {
+  tags: {
     type: Sequelize.ARRAY(Sequelize.TEXT),
     defaultValue: []
   },

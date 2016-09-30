@@ -30,14 +30,15 @@ describe('Utilities', function() {
       var fakePost = {
         url: 'http://www.google.com',
         title: 'This is Gooooogle',
-        keys: ['search', 'ultimate', 'coding', 'prowess'],
-        description: 'These guys are pretty awesome, and smart and funny, probably',
+        tags: ['search', 'ultimate', 'coding', 'prowess'],
+        desc: 'These guys are pretty awesome, and smart and funny, probably',
         author: 'Mr. Bean'
       };
       postUtil.findOrCreateOne(fakePost, function(err, succ) {
+        //console.log(err, succ);
         expect(err).to.equal(null);
         expect(succ.dataValues.title).to.equal(fakePost.title);
-        expect(succ.keys).to.deep.equal(fakePost.keys);
+        expect(succ.tags).to.deep.equal(fakePost.tags);
         done();
       });
     });
@@ -63,12 +64,12 @@ describe('Utilities', function() {
       var newEdgePost = {
         url: 'http://www.blogger1.com/post80',
         title: 'Working with Google Analytics',
-        keys: ['google', 'analytics', 'coding'],
-        description: 'How to make the most of this powerful tool',
+        tags: ['google', 'analytics', 'coding'],
+        desc: 'How to make the most of this powerful tool',
         author: 'Dood Man'
       };
 
-      postUtil.createOneWithEdge(newEdgePost, currUrl, function(err, updated, postToLink) {
+      postUtil.createOneWithEdge(newEdgePost, currUrl, function(err, postToLink, updated) {
         expect(err).to.equal(null);
         expect(updated).to.not.equal(null);
         expect(postToLink).to.not.equal(null);
@@ -84,12 +85,12 @@ describe('Utilities', function() {
       var sameEdgePost = {
         url: 'http://www.blogger1.com/post80',
         title: 'Working with Google Analytics',
-        keys: ['google', 'analytics', 'coding'],
-        description: 'How to make the most of this powerful tool',
+        tags: ['google', 'analytics', 'coding'],
+        desc: 'How to make the most of this powerful tool',
         author: 'Dood Man'
       };
 
-      postUtil.createOneWithEdge(sameEdgePost, currUrl, function(err, updated, postToLink) {
+      postUtil.createOneWithEdge(sameEdgePost, currUrl, function(err, postToLink, updated) {
         expect(err).to.equal(null);
         expect(updated).to.not.equal(null);
         expect(postToLink).to.not.equal(null);
@@ -106,12 +107,12 @@ describe('Utilities', function() {
       var newEdgePost = {
         url: 'http://www.blogger4.com/post2',
         title: 'Google Analytics - sehr schon',
-        keys: ['google', 'analytics', 'deutsch'],
-        description: 'Ich brauchte suchen uber das Google search',
+        tags: ['google', 'analytics', 'deutsch'],
+        desc: 'Ich brauchte suchen uber das Google search',
         author: 'Klaus Jurgenausfallen'
       };
 
-      postUtil.createOneWithEdge(newEdgePost, currUrl, function(err, updated, postToLink) {
+      postUtil.createOneWithEdge(newEdgePost, currUrl, function(err, postToLink, updated) {
         expect(err).to.equal(null);
         expect(updated).to.not.equal(null);
         expect(postToLink).to.not.equal(null);
@@ -127,17 +128,39 @@ describe('Utilities', function() {
       var newEdgePost = {
         url: 'http://www.blogger1.com/post45',
         title: 'Some German coding knowledge',
-        keys: ['coding', 'deutsch'],
-        description: 'Something I found really useful',
+        tags: ['coding', 'deutsch'],
+        desc: 'Something I found really useful',
         author: 'Blah blah'
       };
 
-      postUtil.createOneWithEdge(newEdgePost, currUrl, function(err, updated, postToLink) {
+      postUtil.createOneWithEdge(newEdgePost, currUrl, function(err, postToLink, updated) {
         expect(err).to.equal(null);
         expect(updated).to.not.equal(null);
         expect(postToLink).to.not.equal(null);
 
         expect(updated.inLinks).to.contain(postToLink.postId);
+        done();
+      });
+    });
+
+    it('should handle an undefined argument for currUrl, for crawler logic simplification', function(done) {
+
+      var currUrl = undefined;
+      var newEdgePost = {
+        url: 'http://www.blogger66.com/post434',
+        title: 'A different blog post',
+        tags: ['coding', 'something'],
+        desc: 'More knowledges',
+        author: 'Blah blah'
+      };
+
+      postUtil.createOneWithEdge(newEdgePost, currUrl, function(err, postToLink, updated) {
+        expect(err).to.equal(null);
+        expect(postToLink).to.not.equal(null);
+        expect(updated).to.equal(undefined);
+
+        expect(postToLink.title).to.equal(newEdgePost.title);
+        expect(postToLink.tags).to.deep.equal(newEdgePost.tags);
         done();
       });
     });
