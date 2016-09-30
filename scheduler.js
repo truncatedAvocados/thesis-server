@@ -1,11 +1,5 @@
 const numCPUs = require('os').cpus().length;
 const cluster = require('cluster');
-const baseUrls = require('./baseUrls.json');
-
-const getBaseUrl = (url) => {
-  const regex = new RegExp("^(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(\\?(?:[^#]*))?(#(‌​?:.*))?");
-  return regex.exec(url)[2];
-};
 
 module.exports = {
 	scheduleCrawlersMulti: (urlList) => {
@@ -72,9 +66,7 @@ module.exports = {
     let url;
     while (queue.length > 0) {
       url = queue.shift();
-      if (baseUrls[getBaseUrl(url)]) {
-        cb(url);
-      }
+      cb(url);
     }
   } };
 

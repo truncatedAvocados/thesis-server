@@ -2,6 +2,12 @@ const cheerio = require('./node_modules/cheerio');
 const request = require('./node_modules/request');
 const natural = require('./node_modules/natural');
 const stopwords = require('./node_modules/stopwords').english;
+const baseUrls = require('./baseUrls.json');
+
+
+const getBaseUrl = (url) => {
+  
+};
 
 class PostCrawler {
 
@@ -57,6 +63,11 @@ class PostCrawler {
     return this.postInfo.links;
   }
 
+  getBaseUrl(url) {
+    const regex = new RegExp("^(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(\\?(?:[^#]*))?(#(‌​?:.*))?");
+    return regex.exec(url)[2];
+  }
+
   setLinks() {
     // Remove redirects
     const redirectRegEx = /^\//;
@@ -67,7 +78,7 @@ class PostCrawler {
 
     this.$('#content, #main, .post, .entry').find('a').each((i, elem) => {
       href = this.$(elem).attr('href');
-      if (!redirectRegEx.test(href)) {
+      if (!redirectRegEx.test(href) && baseUrls[this.getBaseUrl(href)]) {
         this.postInfo.links.push(href);
       }
     });
