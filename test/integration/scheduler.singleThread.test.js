@@ -2,17 +2,17 @@ const assert = require('assert');
 const PostCrawler = require('../../postCrawler');
 const scheduler = require('../../scheduler').scheduleCrawlersSingle;
 const links = require('../data/links.json').slice(0, 10);
-//const db = require('../../db/database');
+const db = require('../../workerUtils/postUtils');
 
 describe('Single Thread Scheduler with PostCrawler Integration Tests', () => {
   let crawler;
   let url;
-  let post;
 
   scheduler(links, (link) => {
     url = link.url;
 
     describe('Testing ' + url, () => {
+      let post;
       crawler = new PostCrawler(url);
 
       before((done) => {
@@ -36,6 +36,18 @@ describe('Single Thread Scheduler with PostCrawler Integration Tests', () => {
         } else {
           assert.ok(true);
         }
+      });
+
+      it('Find or create post to database', () => {
+        db.findOrCreateOne(post, (err, entry) => {
+          if (err) {
+            assert.ok(false);
+          } else if (entry === undefined) {
+            assert.ok(false);
+          } else {
+            assert.ok(true);
+          }
+        });
       });
     });
   });
