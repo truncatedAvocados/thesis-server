@@ -16,7 +16,8 @@ describe('Utilities', function() {
     it('should have a bunch of different methods', function() {
       var modules = [
         'findOrCreateOne',
-        'createOneWithEdge'
+        'createOneWithEdge',
+        'findUrl'
       ];
       modules.forEach(function(module) {
         expect(postUtil[module]).to.exist;
@@ -37,6 +38,21 @@ describe('Utilities', function() {
         expect(err).to.equal(null);
         expect(succ.dataValues.title).to.equal(fakePost.title);
         expect(succ.keys).to.deep.equal(fakePost.keys);
+        done();
+      });
+    });
+
+    it('should be able to find a url', function(done) {
+      var url = 'http://www.google.com';
+      postUtil.findUrl(url, function(err, succ) {
+        expect(succ.dataValues.url).to.equal(url);
+        done();
+      });
+    });
+    it('should return a falsy value if url not found', function(done) {
+      var url = 'NOT_A_URL';
+      postUtil.findUrl(url, function(err, succ) {
+        expect(succ).to.be.falsy;
         done();
       });
     });
