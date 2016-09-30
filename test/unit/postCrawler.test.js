@@ -119,7 +119,8 @@ describe('PostCrawler Tests', () => {
       describe('Testing ' + url, () => {
         crawler = new PostCrawler(url);
 
-        beforeEach((done) => {
+        beforeEach(function(done) {
+          this.timeout(4000);
           crawler.get((err, post) => {
             done();
           });
