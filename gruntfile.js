@@ -9,14 +9,26 @@ module.exports = (grunt) => {
               'test/unit/**/*.js'] } },
     karma: {
       unit: {
-        configFile: 'karma.conf.js' } } });
+        configFile: 'karma.conf.js' } },
+    exec: {
+      deploy: {
+        command: 'sudo -E npm start'
+      }
+    }
+   });
 
   grunt.loadNpmTasks('grunt-karma');
   grunt.loadNpmTasks('grunt-mocha-test');
+  grunt.loadNpmTasks('grunt-exec');
 
   grunt.registerTask('build', () => {
     grunt.task.run(['unit']);
 
+  });
+
+  //Todo: concat and minify client files here
+  grunt.registerTask('deploy', () => {
+    grunt.task.run(['exec:deploy']);
   });
 
   grunt.registerTask('unit', () => {
