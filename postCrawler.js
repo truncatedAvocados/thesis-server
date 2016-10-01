@@ -3,16 +3,13 @@ const request = require('./node_modules/request');
 const natural = require('./node_modules/natural');
 const stopwords = require('./node_modules/stopwords').english;
 const baseUrls = require('./baseUrls.json');
-
-
-const getBaseUrl = (url) => {
-  
-};
+const postUtils = require('./workerUtils/postUtils.js');
 
 class PostCrawler {
 
-  constructor(url) {
-    this.url = url;
+  constructor(options) {
+    this.url = options.url;
+    this.parent = options.parent;
     this.$ = null;
 
     this.postInfo = {
@@ -28,19 +25,20 @@ class PostCrawler {
   get(cb) {
     request(this.url, (err, response, body) => {
       if (err) {
+        console.log(err);
         cb(err, null);
-        return;
+        // return;
+      } else {
+        this.$ = cheerio.load(body);
+        this.setTitle();
+        this.setLinks();
+        this.setTags();
+        this.setAuthor();
+        this.setDate();
+        this.setDesc();
+
+        cb(null, this.postInfo);
       }
-
-      this.$ = cheerio.load(body);
-      this.setTitle();
-      this.setLinks();
-      this.setTags();
-      this.setAuthor();
-      this.setDate();
-      this.setDesc();
-
-      cb(null, this.postInfo);
     });
   }
 
@@ -72,14 +70,19 @@ class PostCrawler {
     // Remove redirects
     const redirectRegEx = /^\//;
     let href;
+    var urls = {};
 
     // Remove old links
     this.postInfo.links = [];
 
     this.$('#content, #main, .post, .entry').find('a').each((i, elem) => {
       href = this.$(elem).attr('href');
-      if (!redirectRegEx.test(href) && baseUrls[this.getBaseUrl(href)]) {
-        this.postInfo.links.push(href);
+      if (!redirectRegEx.test(href) && baseUrls[this.getBaseUrl(href)] && !urls[href]) {
+        urls[href] = true;
+        this.postInfo.links.push({
+          parent: this.url,
+          url: href
+        });
       }
     });
   }
@@ -170,4 +173,56 @@ class PostCrawler {
   }
 }
 
-module.exports = PostCrawler;
+exports.PostCrawler = PostCrawler;
+// exports.crawlUrl = (url, cb) => {
+//   console.log('CRAWLING: ', url);
+//   var crawler = new PostCrawler(url);
+//   crawler.get((err, postInfo) => {
+//     if (err) {
+//       console.log(err);
+//     } else {
+//       console.log('POSTINFO LINKS: ', postInfo.links);
+//       cb(postInfo.links);
+//       postUtils.findOrCreateOne(postInfo, (err, found) => {
+//         if (err) {
+//           console.log(err);
+//         } else {
+//           console.log('STORED: ', found.dataValues.url);
+//           //cb(found.links);
+//         }
+//       });
+//     }
+//   });
+
+exports.crawlUrl = (options, cb) => {
+  console.log('CRAWLING: ', options.url);
+  var crawler = new PostCrawler(options);
+  crawler.get((err, postInfo) => {
+    if (err) {
+      console.log(err);
+      cb([]);
+    } else {
+      //console.log('POSTINFO LINKS: ', postInfo.links);
+      cb(postInfo.links);
+      if (crawler.parent) {
+        postUtils.createOneWithEdge(postInfo, crawler.parent, (err, parent, found) => {
+          if (err) {
+            console.log(err);
+          } else {
+            console.log('STORED: ', found.dataValues.url);
+          }
+        });
+      } else {
+        postUtils.findOrCreateOne(postInfo, (err, found) => {
+          if (err) {
+            console.log(err);
+          } else {
+            console.log('STORED: ', found.dataValues.url);
+            //cb(found.links);
+          }
+        });
+      }
+    }
+  });
+
+};
