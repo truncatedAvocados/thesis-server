@@ -2,7 +2,7 @@ const frontPageCrawler = require('./frontPageCrawler.js');
 const crawlUrl = require('./postCrawler').crawlUrl;
 const scheduler = require('./scheduler.js');
 const whitelist = require('./whitelist.json');
-const whiteListKeys = Object.keys(whitelist).slice(0, 10);
+const whiteListKeys = Object.keys(whitelist);
 
 
 if (process.argv.indexOf('--continue') > -1) {
@@ -17,7 +17,3 @@ if (process.argv.indexOf('--continue') > -1) {
   	});
   });
 }
-
-      // cluster.setupMaster({
-      //   exec: __dirname + '/scheduler.js'
-      // });
