@@ -1,5 +1,7 @@
 const numCPUs = require('os').cpus().length;
 const cluster = require('cluster');
+const ON_DEATH = require('death');
+const fs = require('fs');
 
 module.exports = {
 	scheduleCrawlersMulti: (urlList, cb) => {
@@ -7,6 +9,13 @@ module.exports = {
 			var crawled = {};
 			var workers = numCPUs * 2 < urlList.length ? numCPUs * 2 : urlList.length;
 			var urlCount = -1;
+			ON_DEATH((signal, err) => {
+				fs.writeFile('queue.json', JSON.stringify(urlList.slice(urlCount)), (err) => {
+					if (err) {
+						console.log(err);
+					}
+				});
+			});
 			var childMessageHandler = (message) => {
 				if (message.type = 'finish') {
 					crawled[message.data.url] = true;
@@ -47,7 +56,7 @@ module.exports = {
 			}
 			cluster.on('disconnect', (worker) => {
 				workers--;
-				if (workers === 0) {
+				if (workers <= 0) {
 					cluster.disconnect(() => {
 						console.log('Finished');
 					});

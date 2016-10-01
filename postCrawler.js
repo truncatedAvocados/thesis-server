@@ -77,7 +77,7 @@ class PostCrawler {
 
     this.$('#content, #main, .post, .entry').find('a').each((i, elem) => {
       href = this.$(elem).attr('href');
-      if (!redirectRegEx.test(href) && baseUrls[this.getBaseUrl(href)] && !urls[href]) {
+      if (!redirectRegEx.test(href) && baseUrls[this.getBaseUrl(href)] && !urls[href] && this.getBaseUrl(href) != this.getBaseUrl(this.url)) {
         urls[href] = true;
         this.postInfo.links.push({
           parent: this.url,
