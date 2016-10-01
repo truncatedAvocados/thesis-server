@@ -174,25 +174,6 @@ class PostCrawler {
 }
 
 exports.PostCrawler = PostCrawler;
-// exports.crawlUrl = (url, cb) => {
-//   console.log('CRAWLING: ', url);
-//   var crawler = new PostCrawler(url);
-//   crawler.get((err, postInfo) => {
-//     if (err) {
-//       console.log(err);
-//     } else {
-//       console.log('POSTINFO LINKS: ', postInfo.links);
-//       cb(postInfo.links);
-//       postUtils.findOrCreateOne(postInfo, (err, found) => {
-//         if (err) {
-//           console.log(err);
-//         } else {
-//           console.log('STORED: ', found.dataValues.url);
-//           //cb(found.links);
-//         }
-//       });
-//     }
-//   });
 
 exports.crawlUrl = (options, cb) => {
   console.log('CRAWLING: ', options.url);
@@ -202,26 +183,14 @@ exports.crawlUrl = (options, cb) => {
       console.log(err);
       cb([]);
     } else {
-      //console.log('POSTINFO LINKS: ', postInfo.links);
       cb(postInfo.links);
-      if (crawler.parent) {
-        postUtils.createOneWithEdge(postInfo, crawler.parent, (err, parent, found) => {
-          if (err) {
-            console.log(err);
-          } else {
-            console.log('STORED: ', found.dataValues.url);
-          }
-        });
-      } else {
-        postUtils.findOrCreateOne(postInfo, (err, found) => {
-          if (err) {
-            console.log(err);
-          } else {
-            console.log('STORED: ', found.dataValues.url);
-            //cb(found.links);
-          }
-        });
-      }
+      postUtils.createOneWithEdge(postInfo, crawler.parent, (err, found) => {
+        if (err) {
+          console.log(err);
+        } else {
+          console.log('STORED: ', found.dataValues.url);
+        }
+      });
     }
   });
 

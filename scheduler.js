@@ -14,7 +14,7 @@ module.exports = {
 					urlCount++;
 					if (urlList[urlCount]) {
 						if (crawled[urlList[urlCount].url]) {
-							urlList[urlCount] = null;
+							urlList[urlCount].url = null;
 						}
 						cluster.workers[message.from].send({
 							type: 'start',
