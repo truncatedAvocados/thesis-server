@@ -145,13 +145,13 @@ describe('PostCrawler Tests', () => {
           }
         });
 
-        it('Get post links', () => {
-          if (crawler.getLinks().length === 0) {
-            assert.ok(false);
-          } else {
-            assert.ok(true);
-          }
-        });
+        // it('Get post links', () => {
+        //   if (crawler.getLinks().length === 0) {
+        //     assert.ok(false);
+        //   } else {
+        //     assert.ok(true);
+        //   }
+        // });
 
         it('Get post tags', () => {
           if (crawler.getTags().length === 0) {
