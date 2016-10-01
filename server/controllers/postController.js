@@ -6,11 +6,17 @@ var Promise = require('bluebird');
 //Finds one all posts matching a tag, sorting them by inLinks
 exports.findTags = function(req, res) {
 
-  Post.findAll({
-    where: {
+  orQuery = req.query.tags.map(tag => {
+    return { 
       tags: {
-        $contains: req.query.tags
+        $contains: [tag]
       }
+    };
+  });
+
+  Post.findAll({
+    where: { 
+      $or: orQuery
     }
   }).then(function(results) {
     results.sort((a, b) => b.inLinks.length - a.inLinks.length);
