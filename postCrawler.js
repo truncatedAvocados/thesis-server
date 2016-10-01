@@ -77,7 +77,7 @@ class PostCrawler {
 
     this.$('#content, #main, .post, .entry').find('a').each((i, elem) => {
       href = this.$(elem).attr('href');
-      if (!redirectRegEx.test(href) && baseUrls[this.getBaseUrl(href)] && !urls[href]) {
+      if (!redirectRegEx.test(href) && baseUrls[this.getBaseUrl(href)] && !urls[href] && this.getBaseUrl(href) != this.getBaseUrl(this.url)) {
         urls[href] = true;
         this.postInfo.links.push({
           parent: this.url,
@@ -139,7 +139,7 @@ class PostCrawler {
     // Check for author tag
     if (author.length > 0) {
       this.postInfo.author =
-        author.split(' ').filter(word => word.toLowerCase() !== 'by').join(' ');
+        author.split(' ').filter(word => word.toLowerCase() !== 'by').join(' ').slice(0, 30);
     // Use the domain name for the author
     } else {
       this.postInfo.author = urlRegEx.exec(this.postInfo.url)[5];

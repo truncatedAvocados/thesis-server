@@ -1,12 +1,25 @@
 const numCPUs = require('os').cpus().length;
 const cluster = require('cluster');
+const ON_DEATH = require('death');
+const fs = require('fs');
+const path = require('path');
 
 module.exports = {
 	scheduleCrawlersMulti: (urlList, cb) => {
 		if (cluster.isMaster) {
+			cluster.setupMaster({
+        exec: path.join(__dirname, 'childProc.js')
+      });
 			var crawled = {};
 			var workers = numCPUs * 2 < urlList.length ? numCPUs * 2 : urlList.length;
 			var urlCount = -1;
+			ON_DEATH((signal, err) => {
+				fs.writeFile('queue.json', JSON.stringify(urlList.slice(urlCount)), (err) => {
+					if (err) {
+						console.log(err);
+					}
+				});
+			});
 			var childMessageHandler = (message) => {
 				if (message.type = 'finish') {
 					crawled[message.data.url] = true;
@@ -47,31 +60,11 @@ module.exports = {
 			}
 			cluster.on('disconnect', (worker) => {
 				workers--;
-				if (workers === 0) {
+				if (workers <= 0) {
 					cluster.disconnect(() => {
 						console.log('Finished');
 					});
 				}
-			});
-		} else {
-			var masterMessageHandler = (message) => {
-				if (message.type === 'start') {
-					cb(message.data, (links) => {
-						process.send({
-							type: 'finish',
-							from: cluster.worker.id,
-							data: links
-						});
-					});
-				} else if (message.type === 'kill') {
-					cluster.worker.kill();
-				}
-			};
-			process.on('message', masterMessageHandler);
-			process.send({
-				type: 'ready',
-				from: cluster.worker.id,
-				data: []
 			});
 		}
 	},
