@@ -162,7 +162,10 @@ module.exports = {
 		urlList.forEach((url) => {
 			postUtils.findUrl(url, (err, success) => {
 				if (!success) {
-					result.push(url);
+					result.push({
+						parent: null,
+						url: url
+					});
 				}
 				checked.push(url);
 				if (checked.length === urlList.length) {

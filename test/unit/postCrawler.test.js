@@ -1,5 +1,5 @@
 const assert = require('assert');
-const PostCrawler = require('../../postCrawler');
+const PostCrawler = require('../../postCrawler').PostCrawler;
 const links = require('../data/links').slice(100, 110);
 
 describe('PostCrawler Tests', () => {
@@ -117,7 +117,10 @@ describe('PostCrawler Tests', () => {
       url = link.url;
 
       describe('Testing ' + url, () => {
-        crawler = new PostCrawler(url);
+        crawler = new PostCrawler({
+          parent: null,
+          url: url
+        });
 
         beforeEach(function(done) {
           this.timeout(4000);

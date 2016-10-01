@@ -1,22 +1,21 @@
 const numCPUs = require('os').cpus().length;
 const cluster = require('cluster');
-const baseUrls = require('./baseUrls.json');
-
-const getBaseUrl = (url) => {
-  const regex = new RegExp("^(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(\\?(?:[^#]*))?(#(‌​?:.*))?");
-  return regex.exec(url)[2];
-};
 
 module.exports = {
-	scheduleCrawlersMulti: (urlList) => {
+	scheduleCrawlersMulti: (urlList, cb) => {
 		if (cluster.isMaster) {
-			var workers = numCPUs * 2;
+			var crawled = {};
+			var workers = numCPUs * 2 < urlList.length ? numCPUs * 2 : urlList.length;
 			var urlCount = -1;
 			var childMessageHandler = (message) => {
 				if (message.type = 'finish') {
-					urlCount++;
+					crawled[message.data.url] = true;
 					urlList = urlList.concat(message.data);
+					urlCount++;
 					if (urlList[urlCount]) {
+						if (crawled[urlList[urlCount].url]) {
+							urlList[urlCount].url = null;
+						}
 						cluster.workers[message.from].send({
 							type: 'start',
 							from: 'master',
@@ -29,6 +28,14 @@ module.exports = {
 							from: 'master'
 						});
 					}
+				} else if (message.type === 'ready') {
+						urlCount++;
+						cluster.workers[message.from].send({
+							type: 'start',
+							from: 'master',
+							data: urlList[urlCount],
+							count: urlCount
+						});
 				}
 			};
 			var createChild = () => {
@@ -49,12 +56,12 @@ module.exports = {
 		} else {
 			var masterMessageHandler = (message) => {
 				if (message.type === 'start') {
-					console.log(message.data);
-					//crawl(message.data), send to master
-					process.send({
-						type: 'finish',
-						from: cluster.worker.id,
-						data: []
+					cb(message.data, (links) => {
+						process.send({
+							type: 'finish',
+							from: cluster.worker.id,
+							data: links
+						});
 					});
 				} else if (message.type === 'kill') {
 					cluster.worker.kill();
@@ -62,7 +69,7 @@ module.exports = {
 			};
 			process.on('message', masterMessageHandler);
 			process.send({
-				type: 'finish',
+				type: 'ready',
 				from: cluster.worker.id,
 				data: []
 			});
@@ -72,9 +79,10 @@ module.exports = {
     let url;
     while (queue.length > 0) {
       url = queue.shift();
-      if (baseUrls[getBaseUrl(url)]) {
-        cb(url);
-      }
+      cb(url, (links) => {
+      	queue = queue.concat(links);
+      	console.log('Queue Length: ', queue.length);
+      });
     }
   } };
 

@@ -17,7 +17,8 @@ exports.findOrCreateOne = function(postData, cb) {
         title: postData.title,
         tags: postData.tags,
         description: postData.desc,
-        author: postData.author
+        author: postData.author,
+        publishDate: postData.date
       });
     } else {
       cb(null, found);
