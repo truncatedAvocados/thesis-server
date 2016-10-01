@@ -4,7 +4,9 @@ var postController = require('./controllers/postController');
 
 router.get('/posts', function(req, res) {
   console.log('In the GET query for blog posts route: ', req.query.tags);
-  req.query.tags = JSON.parse(req.query.tags);
+  if (req.query.tags) {
+    req.query.tags = JSON.parse(req.query.tags);
+  }
   postController.findTags(req, res);
 });
 
