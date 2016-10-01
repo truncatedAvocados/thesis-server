@@ -30,14 +30,14 @@ describe('Controllers', function() {
         expect(response).to.have.length(2);
         expect(response.map(post => post.title)).to.deep.equal(['Google Analytics - sehr schon', 'Working with Google Analytics']);
         response.forEach(post => {
-          expect(post.keys).to.contain(tags[0]);
+          expect(post.tags).to.contain(tags[0]);
         });
         done();
       });
     });
   
 
-    it('should query for just one post and get its incoming link, ranked', function(done) {
+    it('should query for just one post and get its incoming links, ranked', function(done) {
 
       http.get('http://localhost:3000/api/posts/1', function(err, resp, body) {
         response = JSON.parse(resp.body);
