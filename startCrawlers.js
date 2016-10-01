@@ -1,7 +1,10 @@
 const frontPageCrawler = require('./frontPageCrawler.js');
 const crawlUrl = require('./postCrawler').crawlUrl;
 const scheduler = require('./scheduler.js');
-const whitelist = require('./whitelist.json');
+//const whitelist = require('./whitelist.json');
+const whitelist = {"https://blogs.msdn.microsoft.com/dotnet/": true,
+  "https://blogs.msdn.microsoft.com/oldnewthing/": true,
+  "https://blogs.msdn.microsoft.com/pythonengineering/": true};
 const whiteListKeys = Object.keys(whitelist);
 
 
