@@ -15,9 +15,9 @@ exports.findOrCreateOne = function(postData, cb) {
       return Post.create({
         url: postData.url,
         title: postData.title,
-        keys: postData.tags,
+        tags: postData.tags,
         description: postData.desc,
-        author: postData.autho
+        author: postData.author
       });
     } else {
       cb(null, found);
@@ -51,11 +51,14 @@ exports.createOneWithEdge = function(postData, currUrl, cb) {
   var postToLink;
 
   this.findOrCreateOne(postData, function(err, success) {
+
     if (success) {
 
       postToLink = success;
 
-      //We should know that this post exists, since the web crawler just created it
+      //If currUrl is undefined we know the crawler is at the top level
+      //if (currUrl) {
+        //We know that this will exist
       Post.findOne({
         where: {
           url: currUrl
@@ -63,23 +66,27 @@ exports.createOneWithEdge = function(postData, currUrl, cb) {
       }).then(function(linkee) {
         //We don't want to add the same ID more than once, otherwise the validity of our ranking algorithm becomes diluted
         //This is an edge case, just in case the post being linked has already been linked
-        var temp = linkee.inLinks ? linkee.inLinks.slice() : [];
-        if (temp.includes(postToLink.postId)) {
+        if (linkee) {
+          var temp = linkee.inLinks ? linkee.inLinks.slice() : [];
+          if (temp.includes(postToLink.postId)) {
 
-          cb(null, linkee, postToLink);
+            cb(null, postToLink, linkee);
 
+          } else {
+
+            temp.push(postToLink.postId);
+            return linkee.updateAttributes({
+              inLinks: temp
+            });
+          }
         } else {
-
-          temp.push(postToLink.postId);
-          return linkee.updateAttributes({
-            inLinks: temp
-          });
-
+          cb(null, postToLink);
         }
+     // }
 
       }).then(function(updated) {
         if (updated) {
-          cb(null, updated, postToLink);
+          cb(null, postToLink, updated);
         }
       }).catch(function(err) {
         cb(err);

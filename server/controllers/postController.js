@@ -8,7 +8,7 @@ exports.findTags = function(req, res) {
 
   Post.findAll({
     where: {
-      keys: {
+      tags: {
         $contains: req.query.tags
       }
     }
