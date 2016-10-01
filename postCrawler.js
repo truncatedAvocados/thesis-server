@@ -152,8 +152,8 @@ class PostCrawler {
 
   setDate() {
     const dateString =
-      this.$('.date, .datetime, .post-date, .date-time, time').text();
-    this.postInfo.date = new Date(dateString);
+      Date.parse(this.$('.date, .datetime, .post-date, .date-time, time').text());
+    this.postInfo.date = isNaN(dateString) ? undefined : new Date(dateString);
   }
 
   getDesc() {

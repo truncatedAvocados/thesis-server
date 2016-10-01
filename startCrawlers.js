@@ -3,7 +3,7 @@ const frontPageCrawler = require('./frontPageCrawler.js');
 const crawlUrl = require('./postCrawler').crawlUrl;
 const scheduler = require('./scheduler.js');
 const whitelist = require('./whitelist.json');
-const whiteListKeys = Object.keys(whitelist);
+const whiteListKeys = Object.keys(whitelist).slice(0, 10);
 
 frontPageCrawler.getPosts(whiteListKeys, (results) => {
 	console.log('FRONT PAGE POSTS: ', results.length);
