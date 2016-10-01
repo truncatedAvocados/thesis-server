@@ -2,10 +2,14 @@ const numCPUs = require('os').cpus().length;
 const cluster = require('cluster');
 const ON_DEATH = require('death');
 const fs = require('fs');
+const path = require('path');
 
 module.exports = {
 	scheduleCrawlersMulti: (urlList, cb) => {
 		if (cluster.isMaster) {
+			cluster.setupMaster({
+        exec: path.join(__dirname, 'childProc.js')
+      });
 			var crawled = {};
 			var workers = numCPUs * 2 < urlList.length ? numCPUs * 2 : urlList.length;
 			var urlCount = -1;
@@ -61,26 +65,6 @@ module.exports = {
 						console.log('Finished');
 					});
 				}
-			});
-		} else {
-			var masterMessageHandler = (message) => {
-				if (message.type === 'start') {
-					cb(message.data, (links) => {
-						process.send({
-							type: 'finish',
-							from: cluster.worker.id,
-							data: links
-						});
-					});
-				} else if (message.type === 'kill') {
-					cluster.worker.kill();
-				}
-			};
-			process.on('message', masterMessageHandler);
-			process.send({
-				type: 'ready',
-				from: cluster.worker.id,
-				data: []
 			});
 		}
 	},
