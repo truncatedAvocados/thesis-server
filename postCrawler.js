@@ -77,8 +77,8 @@ class PostCrawler {
 
     this.$('#content, #main, .post, .entry').find('a').each((i, elem) => {
       href = this.$(elem).attr('href');
-      console.log('HREF: ', this.getBaseUrl(href));
-      console.log('BASEURL: ', this.getBaseUrl(this.url));
+      // console.log('HREF: ', this.getBaseUrl(href));
+      // console.log('BASEURL: ', this.getBaseUrl(this.url));
       if (!redirectRegEx.test(href) && baseUrls[this.getBaseUrl(href)] && !urls[href] && this.getBaseUrl(href) != this.getBaseUrl(this.url)) {
         urls[href] = true;
         this.postInfo.links.push({
