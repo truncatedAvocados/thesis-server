@@ -1,13 +1,18 @@
 var db = require('../db/database.js');
 var Post = db.Post;
 var Edges = db.Edges;
+var Authors = db.Authors;
+var Tags = db.Tags;
+
 var Promise = require('bluebird');
 
 exports.findOrCreateOne = function(postData, cb) {
 
-  var createdPost;
-  var createdAuthors;
-  var createdTags;
+  var createdPost, createdAuthors, createdTags;
+
+  postData.author = postData.author instanceof Array 
+                      ? postData.author 
+                      : [postData.author];
 
   //create post
     //if it was created, have to add many to many relations
@@ -27,21 +32,47 @@ exports.findOrCreateOne = function(postData, cb) {
       return Post.create({
         url: postData.url,
         title: postData.title,
-        tags: postData.tags,
+        oldTags: postData.tags,
         description: postData.desc,
-        author: postData.author,
+        author: postData.author[0],
         publishDate: postData.date
       });
     } else {
       cb(null, found);
     }
   }).then(function(created) {
-    // console.log('Here: ', created);
 
-    //return created.addAuthors()
-    if (created) {
-      cb(null, created);
-    }
+    createdPost = created;
+    return Promise.all(postData.author.map(function(auth) {
+      return Authors.findOrCreate({
+        where: {
+          name: auth
+        }
+      }).spread();
+    }));
+
+  }).then(function(authors) {
+
+    return createdPost.addAuthors(authors);
+
+  }).then(function(updated) {
+
+    return Promise.all(postData.tags.map(function(tag) {
+      return Authors.findOrCreate({
+        where: {
+          name: tag
+        }
+      }).spread();
+    }));
+
+  }).then(function(tags) {
+
+    return createdPost.addTags(tags);
+
+  }).then(function(updated) {
+
+    cb(null, updated);
+
   }).catch(function(err) {
     // console.log(err);
     cb(err);
