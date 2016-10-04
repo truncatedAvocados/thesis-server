@@ -3,7 +3,7 @@ const request = require('./node_modules/request');
 const natural = require('./node_modules/natural');
 const stopwords = require('./node_modules/stopwords').english;
 const baseUrls = require('./baseUrls.json');
-const postUtils = require('./workerUtils/postUtils.js');
+const postUtils = require('./workerUtils/postUtils');
 
 class PostCrawler {
 
@@ -25,9 +25,7 @@ class PostCrawler {
   get(cb) {
     request(this.url, (err, response, body) => {
       if (err) {
-        console.log(err);
         cb(err, null);
-        // return;
       } else {
         this.$ = cheerio.load(body);
         this.setTitle();
@@ -70,21 +68,21 @@ class PostCrawler {
     // Remove redirects
     const redirectRegEx = /^\//;
     let href;
-    var urls = {};
+    const urls = {};
 
     // Remove old links
     this.postInfo.links = [];
 
     this.$('#content, #main, .post, .entry').find('a').each((i, elem) => {
       href = this.$(elem).attr('href');
-      // console.log('HREF: ', this.getBaseUrl(href));
-      // console.log('BASEURL: ', this.getBaseUrl(this.url));
-      if (!redirectRegEx.test(href) && baseUrls[this.getBaseUrl(href)] && !urls[href] && this.getBaseUrl(href) != this.getBaseUrl(this.url)) {
+      if (!redirectRegEx.test(href) &&
+          baseUrls[this.getBaseUrl(href)] &&
+          !urls[href] &&
+          this.getBaseUrl(href) !== this.getBaseUrl(this.url)) {
         urls[href] = true;
         this.postInfo.links.push({
           parent: this.url,
-          url: href
-        });
+          url: href });
       }
     });
   }
@@ -179,21 +177,21 @@ exports.PostCrawler = PostCrawler;
 
 exports.crawlUrl = (options, cb) => {
   console.log('CRAWLING: ', options.url);
-  var crawler = new PostCrawler(options);
-  crawler.get((err, postInfo) => {
-    if (err) {
-      console.log(err);
+  const crawler = new PostCrawler(options);
+  crawler.get((errGet, postInfo) => {
+    if (errGet) {
+      console.log(errGet);
       cb([]);
     } else {
       cb(postInfo.links);
-      postUtils.createOneWithEdge(postInfo, crawler.parent, (err, found) => {
-        if (err) {
-          console.log(err);
+      postUtils.createOneWithEdge(postInfo, crawler.parent, (errEdge, found) => {
+        if (errEdge) {
+          console.log(errEdge);
         } else {
           console.log('STORED: ', found.dataValues.url);
         }
       });
     }
   });
-
 };
+
