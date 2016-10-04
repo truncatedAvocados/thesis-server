@@ -28,7 +28,7 @@ describe('Controllers', function() {
       http.get('http://localhost:3000/api/posts?tags=' + JSON.stringify(tags), function(err, resp, body) {
         response = JSON.parse(resp.body);
         expect(response).to.have.length(2);
-        expect(response.map(post => post.title)).to.deep.equal(['Google Analytics - sehr schon', 'Working with Google Analytics']);
+        expect(response.map(post => post.title)).to.deep.equal(['Working with Google Analytics', 'Google Analytics - sehr schon']);
         response.forEach(post => {
           expect(post.tags).to.contain(tags[0]);
         });
@@ -39,10 +39,10 @@ describe('Controllers', function() {
 
     it('should query for just one post and get its incoming links, ranked', function(done) {
 
-      http.get('http://localhost:3000/api/posts/1', function(err, resp, body) {
+      http.get('http://localhost:3000/api/posts/2', function(err, resp, body) {
         response = JSON.parse(resp.body);
         expect(response).to.have.length(2);
-        expect(response.map(post => post.title)).to.deep.equal(['Google Analytics - sehr schon', 'Working with Google Analytics']);
+        expect(response.map(post => post.title)).to.deep.equal(['This is Gooooogle', 'Google Analytics - sehr schon']);
         //Any other check to be done here?
         done();
       });
