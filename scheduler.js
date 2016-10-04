@@ -3,9 +3,10 @@ const cluster = require('cluster');
 const ON_DEATH = require('death');
 const fs = require('fs');
 const path = require('path');
+const crawlUrl = require('./postCrawler').crawlUrl;
 
 module.exports = {
-	scheduleCrawlersMulti: (urlList, cb) => {
+	scheduleCrawlersMulti: (urlList, callback) => {
 		if (cluster.isMaster) {
 			cluster.setupMaster({
         exec: path.join(__dirname, 'childProc.js')
@@ -63,19 +64,30 @@ module.exports = {
 				if (workers <= 0) {
 					cluster.disconnect(() => {
 						console.log('Finished');
+						callback(new Date().getTime());
 					});
 				}
 			});
 		}
 	},
-  scheduleCrawlersSingle: (queue, cb) => {
-    let url;
-    while (queue.length > 0) {
-      url = queue.shift();
-      cb(url, (links) => {
-      	queue = queue.concat(links);
-      	console.log('Queue Length: ', queue.length);
-      });
-    }
-  } };
+  scheduleCrawlers: (urlList, callback) => {
+  	if (urlList.length === 0) {
+  		console.log('DONE');
+  		callback(new Date().getTime());
+  		return;
+  	}
+  	var scheduleCrawlers = module.exports.scheduleCrawlers;
+    var count = 0;
+    var result = [];
+    urlList.forEach((url) => {
+    	crawlUrl(url, (links) => {
+    		result = result.concat(links);
+    		count++;
+    		if (count === urlList.length) {
+    			scheduleCrawlers(result, callback);
+    		}
+    	});
+    });
+  } 
+};
 

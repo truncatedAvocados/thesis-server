@@ -109,7 +109,7 @@ module.exports = {
 	},
 	filterPosts: (urlList, callback) => {
 		var result = [];
-		var checked = [];
+		var count = 0;
 		urlList.forEach((url) => {
 			postUtils.findUrl(url, (err, success) => {
 				if (!success) {
@@ -118,8 +118,8 @@ module.exports = {
 						url: url
 					});
 				}
-				checked.push(url);
-				if (checked.length === urlList.length) {
+				count++;
+				if (count === urlList.length) {
 					callback(result);
 				}
 			});	
