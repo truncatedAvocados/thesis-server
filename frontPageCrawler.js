@@ -265,5 +265,89 @@ module.exports = {
 			});
 		}
 	},
+	getSiteMapsMulti: (urlList, callback) => {
+		if (cluster.isMaster) {
+			var urlCount = -1;
+			var result = {};
+			var workers = numCPUs * 2;
+			var childMessageHandler = (message) => {
+				if (message.type == 'ready') {
+					urlCount++;
+					var url = urlList[urlCount][urlList[urlCount].length - 1] === '/' ? urlList[urlCount] + 'sitemap.xml' : urlList[urlCount] + '/sitemap.xml';
+					cluster.workers[message.from].send({
+						type: 'start',
+						from: 'master',
+						url: url
+					});
+				} else if (message.type === 'finish') {
+					urlCount++;
+					var url = urlList[urlCount][urlList[urlCount].length - 1] === '/' ? urlList[urlCount] + 'sitemap.xml' : urlList[urlCount] + '/sitemap.xml';
+					result[message.url] = message.data;
+					if (urlList[urlCount]) {
+						cluster.workers[message.from].send({
+							type: 'start',
+							from: 'master',
+							url: url
+						});
+					} else {
+						cluster.workers[message.from].send({
+							type: 'kill',
+							from: 'master'
+						});	
+					}
+				}
+			};
+			var createChild = () => {
+				var child = cluster.fork();
+				child.on('message', childMessageHandler);
+			};
+			for (var i = 0; i < workers; i++) {
+				createChild();
+			}
+			cluster.on('disconnect', (worker) => {
+				workers--;
+				if (workers === 0) {
+					cluster.disconnect(() => {
+						callback(result);
+					});
+				}
+			});
+		} else {		
+			var getSiteMap = (url) => {
+				var result = {};
+				request(url, (err, res, xml) => {
+					if (err) {
+						console.log(err);
+					} else {
+						var $ = cheerio.load(xml);
+						var urls = $('loc');
+						console.log(urls);
+					}
+					process.send({
+						type: 'finish',
+						from: cluster.worker.id,
+						data: result,
+						url: url
+					});
+				});
+			};
+			var masterMessageHandler = (message) => {
+				if (message.type === 'start') {
+					if (message.url) {
+						getSiteMap(message.url);
+					} else {
+						cluster.worker.kill();
+					}
+				} else if (message.type === 'kill') {
+					cluster.worker.kill();
+				}
+			};
+			process.on('message', masterMessageHandler);
+			process.send({
+				type: 'ready',
+				from: cluster.worker.id,
+			});
+		}
+	},
 };
 
