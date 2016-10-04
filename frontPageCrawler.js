@@ -63,99 +63,99 @@ module.exports = {
 			addPosts(0);
 		}
 	},
-	getPostsMulti: (urlList, callback) => {
-		if (!urlList || urlList.length === 0) {
-			callback([]);
-		} else {
-			if (cluster.isMaster) {
-				var urlCount = -1;
-				var result = [];
-				var workers = numCPUs * 2;
-				var childMessageHandler = (message) => {
-					if (message.type === 'finish') {
-						urlCount++;
-						result = result.concat(message.data);
-						if (urlList[urlCount]) {
-							cluster.workers[message.from].send({
-								type: 'start',
-								from: 'master',
-								data: urlList[urlCount]
-							});
-						} else {
-							cluster.workers[message.from].send({
-								type: 'kill',
-								from: 'master'
-							});	
-						}
-					}
-				};
-				var createChild = () => {
-					var child = cluster.fork();
-					child.on('message', childMessageHandler);
-				};
-				for (var i = 0; i < workers; i++) {
-					createChild();
-				}
-				cluster.on('disconnect', (worker) => {
-					workers--;
-					if (workers === 0) {
-						cluster.disconnect(() => {
-							callback(result);
-						});
-					}
-				});
-			} else {		
-				var added = {};
-				var filters = ['header', 'footer', 'aside', 'nav', '.nav', '.navbar'];
+	// getPostsMulti: (urlList, callback) => {
+	// 	if (!urlList || urlList.length === 0) {
+	// 		callback([]);
+	// 	} else {
+	// 		if (cluster.isMaster) {
+	// 			var urlCount = -1;
+	// 			var result = [];
+	// 			var workers = numCPUs * 2;
+	// 			var childMessageHandler = (message) => {
+	// 				if (message.type === 'finish') {
+	// 					urlCount++;
+	// 					result = result.concat(message.data);
+	// 					if (urlList[urlCount]) {
+	// 						cluster.workers[message.from].send({
+	// 							type: 'start',
+	// 							from: 'master',
+	// 							data: urlList[urlCount]
+	// 						});
+	// 					} else {
+	// 						cluster.workers[message.from].send({
+	// 							type: 'kill',
+	// 							from: 'master'
+	// 						});	
+	// 					}
+	// 				}
+	// 			};
+	// 			var createChild = () => {
+	// 				var child = cluster.fork();
+	// 				child.on('message', childMessageHandler);
+	// 			};
+	// 			for (var i = 0; i < workers; i++) {
+	// 				createChild();
+	// 			}
+	// 			cluster.on('disconnect', (worker) => {
+	// 				workers--;
+	// 				if (workers === 0) {
+	// 					cluster.disconnect(() => {
+	// 						callback(result);
+	// 					});
+	// 				}
+	// 			});
+	// 		} else {		
+	// 			var added = {};
+	// 			var filters = ['header', 'footer', 'aside', 'nav', '.nav', '.navbar'];
 
-				var addPosts = (url) => {
-					var result = [];
-					request(url, (err, res, html) => {
-						if (err) {
-							console.log(err);
-						} else {
-							var $ = cheerio.load(html);
-							filters.forEach((filter) => {
-								$(filter).empty();
-							});
-							var anchors = $('a');
-							for (var key in anchors) {
-								var blogPostUrl = getAndCheckUrl(anchors[key], url);
-								if (blogPostUrl && !added[blogPostUrl]) {
-									added[blogPostUrl] = true;
-									result.push(blogPostUrl);
-								}
-							}
-						}
-						process.send({
-							type: 'finish',
-							from: cluster.worker.id,
-							data: result
-						});
-					});
-				};
-				var masterMessageHandler = (message) => {
-					if (message.type === 'start') {
-						console.log(message.data);
-						if (message.data) {
-							addPosts(message.data);
-						} else {
-							cluster.worker.kill();
-						}
-					} else if (message.type === 'kill') {
-						cluster.worker.kill();
-					}
-				};
-				process.on('message', masterMessageHandler);
-				//send message to start communication
-				process.send({
-					type: 'finish',
-					from: cluster.worker.id,
-					data: []
-				});
-			}
-		}
-	},
+	// 			var addPosts = (url) => {
+	// 				var result = [];
+	// 				request(url, (err, res, html) => {
+	// 					if (err) {
+	// 						console.log(err);
+	// 					} else {
+	// 						var $ = cheerio.load(html);
+	// 						filters.forEach((filter) => {
+	// 							$(filter).empty();
+	// 						});
+	// 						var anchors = $('a');
+	// 						for (var key in anchors) {
+	// 							var blogPostUrl = getAndCheckUrl(anchors[key], url);
+	// 							if (blogPostUrl && !added[blogPostUrl]) {
+	// 								added[blogPostUrl] = true;
+	// 								result.push(blogPostUrl);
+	// 							}
+	// 						}
+	// 					}
+	// 					process.send({
+	// 						type: 'finish',
+	// 						from: cluster.worker.id,
+	// 						data: result
+	// 					});
+	// 				});
+	// 			};
+	// 			var masterMessageHandler = (message) => {
+	// 				if (message.type === 'start') {
+	// 					console.log(message.data);
+	// 					if (message.data) {
+	// 						addPosts(message.data);
+	// 					} else {
+	// 						cluster.worker.kill();
+	// 					}
+	// 				} else if (message.type === 'kill') {
+	// 					cluster.worker.kill();
+	// 				}
+	// 			};
+	// 			process.on('message', masterMessageHandler);
+	// 			//send message to start communication
+	// 			process.send({
+	// 				type: 'finish',
+	// 				from: cluster.worker.id,
+	// 				data: []
+	// 			});
+	// 		}
+	// 	}
+	// },
 	filterPosts: (urlList, callback) => {
 		var result = [];
 		var checked = [];
@@ -173,6 +173,97 @@ module.exports = {
 				}
 			});	
 		});
-	}
+	},
+	getDataMulti: (urlList, callback) => {
+		if (cluster.isMaster) {
+			var urlCount = -1;
+			var result = {};
+			var workers = numCPUs * 2;
+			var childMessageHandler = (message) => {
+				if (message.type == 'ready') {
+					urlCount++;
+					cluster.workers[message.from].send({
+						type: 'start',
+						from: 'master',
+						url: urlList[urlCount]
+					});
+				} else if (message.type === 'finish') {
+					urlCount++;
+					result[message.url] = message.data;
+					if (urlList[urlCount]) {
+						cluster.workers[message.from].send({
+							type: 'start',
+							from: 'master',
+							url: urlList[urlCount]
+						});
+					} else {
+						cluster.workers[message.from].send({
+							type: 'kill',
+							from: 'master'
+						});	
+					}
+				}
+			};
+			var createChild = () => {
+				var child = cluster.fork();
+				child.on('message', childMessageHandler);
+			};
+			for (var i = 0; i < workers; i++) {
+				createChild();
+			}
+			cluster.on('disconnect', (worker) => {
+				workers--;
+				if (workers === 0) {
+					cluster.disconnect(() => {
+						callback(result);
+					});
+				}
+			});
+		} else {		
+			var getUrlData = (url) => {
+				var result = {};
+				request(url, (err, res, html) => {
+					if (err) {
+						console.log(err);
+					} else {
+						var $ = cheerio.load(html);
+						var elems = $('a');
+						elems.each((i, elem) => {
+							var elemClass = $(elem).attr('class');
+							if (elemClass) {
+								if (result[elemClass]) {
+									result[elemClass]++;
+								} else {
+									result[elemClass] = 1;
+								}
+							}
+						});
+					}
+					process.send({
+						type: 'finish',
+						from: cluster.worker.id,
+						data: result,
+						url: url
+					});
+				});
+			};
+			var masterMessageHandler = (message) => {
+				if (message.type === 'start') {
+					if (message.url) {
+						getUrlData(message.url);
+					} else {
+						cluster.worker.kill();
+					}
+				} else if (message.type === 'kill') {
+					cluster.worker.kill();
+				}
+			};
+			process.on('message', masterMessageHandler);
+			process.send({
+				type: 'ready',
+				from: cluster.worker.id,
+			});
+		}
+	},
 };
 
