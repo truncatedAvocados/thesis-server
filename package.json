@@ -31,6 +31,7 @@
     "grunt-exec": "^1.0.1",
     "morgan": "^1.7.0",
     "natural": "^0.4.0",
+    "nlcst-to-string": "^2.0.0",
     "nodemon": "^1.10.2",
     "os": "^0.1.1",
     "path": "^0.12.7",
