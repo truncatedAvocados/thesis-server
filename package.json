@@ -36,6 +36,7 @@
     "path": "^0.12.7",
     "pg": "^6.1.0",
     "request": "^2.75.0",
+    "retext": "^4.0.0",
     "retext-keywords": "^3.0.0",
     "sequelize": "^3.24.3",
     "stopword": "^0.1.1",
