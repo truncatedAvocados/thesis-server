@@ -45,51 +45,52 @@ exports.findUrl = (url, cb) => {
   });
 };
 
-exports.createOneWithEdge = function(postData, currUrl, cb) {
+exports.createOneWithEdge = function(postData, parentUrl, cb) {
 
-  //currUrl is the thing we would like to add an
-  //edge pointing towards
-  var postToLink;
+  //parentUrl is the thing we would like to add an
+  //edge pointing FROM
+  var postToAddEdge, parent;
 
   this.findOrCreateOne(postData, function(err, success) {
 
     if (success) {
 
-      postToLink = success;
+      postToAddEdge = success;
 
-      //If currUrl is undefined we know the crawler is at the top level
-      //if (currUrl) {
-        //We know that this will exist
+      //This SHOULD already exist. So the else statement is just to handle edge cases but hopefully would never be called
       Post.findOne({
         where: {
-          url: currUrl
+          url: parentUrl
         }
-      }).then(function(linkee) {
+      }).then(function(linkFrom) {
         //We don't want to add the same ID more than once, otherwise the validity of our ranking algorithm becomes diluted
         //This is an edge case, just in case the post being linked has already been linked
-        if (linkee) {
-          var temp = linkee.inLinks ? linkee.inLinks.slice() : [];
-          if (temp.includes(postToLink.postId)) {
+        
+        if (linkFrom) {
+          parent = linkFrom;
+          var temp = postToAddEdge.inLinks ? postToAddEdge.inLinks.slice() : [];
+          if (temp.includes(linkFrom.postId)) {
 
-            cb(null, postToLink, linkee);
+            cb(null, postToAddEdge, linkFrom);
 
           } else {
 
-            temp.push(postToLink.postId);
-            return linkee.updateAttributes({
+            temp.push(linkFrom.postId);
+            return postToAddEdge.updateAttributes({
               inLinks: temp
             });
           }
         } else {
-          cb(null, postToLink);
+          cb(null, postToAddEdge);
         }
      // }
 
       }).then(function(updated) {
         if (updated) {
-          cb(null, postToLink, updated);
+          cb(null, updated, parent);
         }
       }).catch(function(err) {
+        console.log(err);
         cb(err);
       });
 

@@ -65,10 +65,10 @@ Once changes are approved, pulled into the master branch, and tested locally, ad
 
 ```
 git pull origin master
-grunt deploy
+deploy
 ```
 
-That's it! Grunt will take care of starting the server and workers, as well as performing concatenation and minification of client files.
+That's it! Deploy is an alias in the EC2 image and will begin the server in the background with `nohup`, as well as performing concatenation and minification of client files.
 
 ## Detailed Workflow
 

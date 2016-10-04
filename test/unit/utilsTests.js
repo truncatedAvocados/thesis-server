@@ -60,7 +60,7 @@ describe('Utilities', function() {
 
     it('should be able to create a new post with an edge', function(done) {
 
-      var currUrl = 'http://www.google.com';
+      var parentUrl = 'http://www.google.com';
       var newEdgePost = {
         url: 'http://www.blogger1.com/post80',
         title: 'Working with Google Analytics',
@@ -69,19 +69,19 @@ describe('Utilities', function() {
         author: 'Dood Man'
       };
 
-      postUtil.createOneWithEdge(newEdgePost, currUrl, function(err, postToLink, updated) {
+      postUtil.createOneWithEdge(newEdgePost, parentUrl, function(err, postToAddEdge, parent) {
         expect(err).to.equal(null);
-        expect(updated).to.not.equal(null);
-        expect(postToLink).to.not.equal(null);
+        expect(parent).to.not.equal(null);
+        expect(postToAddEdge).to.not.equal(null);
 
-        expect(updated.inLinks).to.contain(postToLink.postId);
+        expect(postToAddEdge.inLinks).to.contain(parent.postId);
         done();
       });
     });
 
     it('should not add extraneous edges', function(done) {
 
-      var currUrl = 'http://www.google.com';
+      var parentUrl = 'http://www.google.com';
       var sameEdgePost = {
         url: 'http://www.blogger1.com/post80',
         title: 'Working with Google Analytics',
@@ -90,11 +90,11 @@ describe('Utilities', function() {
         author: 'Dood Man'
       };
 
-      postUtil.createOneWithEdge(sameEdgePost, currUrl, function(err, postToLink, updated) {
+      postUtil.createOneWithEdge(sameEdgePost, parentUrl, function(err, postToAddEdge, parent) {
         expect(err).to.equal(null);
-        expect(updated).to.not.equal(null);
-        expect(postToLink).to.not.equal(null);
-        expect(updated.inLinks.filter(entry => entry === postToLink.postId)).to.have.length(1);
+        expect(parent).to.not.equal(null);
+        expect(postToAddEdge).to.not.equal(null);
+        expect(postToAddEdge.inLinks.filter(entry => entry === parent.postId)).to.have.length(1);
         done();
       });
 
@@ -103,8 +103,7 @@ describe('Utilities', function() {
 
     it('should be able to find an existing post and add an edge', function(done) {
 
-      var currUrl = 'http://www.google.com';
-      var newEdgePost = {
+      var parentPost = {
         url: 'http://www.blogger4.com/post2',
         title: 'Google Analytics - sehr schon',
         tags: ['google', 'analytics', 'deutsch'],
@@ -112,19 +111,30 @@ describe('Utilities', function() {
         author: 'Klaus Jurgenausfallen'
       };
 
-      postUtil.createOneWithEdge(newEdgePost, currUrl, function(err, postToLink, updated) {
-        expect(err).to.equal(null);
-        expect(updated).to.not.equal(null);
-        expect(postToLink).to.not.equal(null);
+      var sameEdgePost = {
+        url: 'http://www.blogger1.com/post80',
+        title: 'Working with Google Analytics',
+        tags: ['google', 'analytics', 'coding'],
+        desc: 'How to make the most of this powerful tool',
+        author: 'Dood Man'
+      };
 
-        expect(updated.inLinks).to.contain(postToLink.postId);
-        done();
+      postUtil.findOrCreateOne(parentPost, function(err, parent) {
+        postUtil.createOneWithEdge(sameEdgePost, parent.url, function(err, postToAddEdge, parent) {
+          expect(err).to.equal(null);
+          expect(parent).to.not.equal(null);
+          expect(postToAddEdge).to.not.equal(null);
+
+          expect(postToAddEdge.inLinks).to.contain(parent.postId);
+          done();
+        });
+        
       });
     });
 
     it('should add more edges in Web Crawler BFS manner', function(done) {
 
-      var currUrl = 'http://www.blogger4.com/post2';
+      var parentUrl = 'http://www.blogger4.com/post2';
       var newEdgePost = {
         url: 'http://www.blogger1.com/post45',
         title: 'Some German coding knowledge',
@@ -133,12 +143,12 @@ describe('Utilities', function() {
         author: 'Blah blah'
       };
 
-      postUtil.createOneWithEdge(newEdgePost, currUrl, function(err, postToLink, updated) {
+      postUtil.createOneWithEdge(newEdgePost, parentUrl, function(err, postToAddEdge, parent) {
         expect(err).to.equal(null);
-        expect(updated).to.not.equal(null);
-        expect(postToLink).to.not.equal(null);
+        expect(parent).to.not.equal(null);
+        expect(postToAddEdge).to.not.equal(null);
 
-        expect(updated.inLinks).to.contain(postToLink.postId);
+        expect(postToAddEdge.inLinks).to.contain(parent.postId);
         done();
       });
     });
