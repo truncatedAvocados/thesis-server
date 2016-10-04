@@ -20,7 +20,7 @@ var masterMessageHandler = (message) => {
 };
 process.on('message', masterMessageHandler);
 process.send({
-  type: 'exit',
+  type: 'ready',
   from: cluster.worker.id,
   data: []
 });
