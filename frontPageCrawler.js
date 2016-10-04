@@ -73,99 +73,40 @@ module.exports = {
 			addPosts(0);
 		}
 	},
-	// getPostsMulti: (urlList, callback) => {
-	// 	if (!urlList || urlList.length === 0) {
-	// 		callback([]);
-	// 	} else {
-	// 		if (cluster.isMaster) {
-	// 			var urlCount = -1;
-	// 			var result = [];
-	// 			var workers = numCPUs * 2;
-	// 			var childMessageHandler = (message) => {
-	// 				if (message.type === 'finish') {
-	// 					urlCount++;
-	// 					result = result.concat(message.data);
-	// 					if (urlList[urlCount]) {
-	// 						cluster.workers[message.from].send({
-	// 							type: 'start',
-	// 							from: 'master',
-	// 							data: urlList[urlCount]
-	// 						});
-	// 					} else {
-	// 						cluster.workers[message.from].send({
-	// 							type: 'kill',
-	// 							from: 'master'
-	// 						});	
-	// 					}
-	// 				}
-	// 			};
-	// 			var createChild = () => {
-	// 				var child = cluster.fork();
-	// 				child.on('message', childMessageHandler);
-	// 			};
-	// 			for (var i = 0; i < workers; i++) {
-	// 				createChild();
-	// 			}
-	// 			cluster.on('disconnect', (worker) => {
-	// 				workers--;
-	// 				if (workers === 0) {
-	// 					cluster.disconnect(() => {
-	// 						callback(result);
-	// 					});
-	// 				}
-	// 			});
-	// 		} else {		
-	// 			var added = {};
-	// 			var filters = ['header', 'footer', 'aside', 'nav', '.nav', '.navbar'];
+	getPosts2: (urlList, callback) => {
+		var result = [];			
+		var added = {};
+		var filters = ['header', 'footer', 'aside', 'nav', '.nav', '.navbar'];
+		var count = 0;
 
-	// 			var addPosts = (url) => {
-	// 				var result = [];
-	// 				request(url, (err, res, html) => {
-	// 					if (err) {
-	// 						console.log(err);
-	// 					} else {
-	// 						var $ = cheerio.load(html);
-	// 						filters.forEach((filter) => {
-	// 							$(filter).empty();
-	// 						});
-	// 						var anchors = $('a');
-	// 						for (var key in anchors) {
-	// 							var blogPostUrl = getAndCheckUrl(anchors[key], url);
-	// 							if (blogPostUrl && !added[blogPostUrl]) {
-	// 								added[blogPostUrl] = true;
-	// 								result.push(blogPostUrl);
-	// 							}
-	// 						}
-	// 					}
-	// 					process.send({
-	// 						type: 'finish',
-	// 						from: cluster.worker.id,
-	// 						data: result
-	// 					});
-	// 				});
-	// 			};
-	// 			var masterMessageHandler = (message) => {
-	// 				if (message.type === 'start') {
-	// 					console.log(message.data);
-	// 					if (message.data) {
-	// 						addPosts(message.data);
-	// 					} else {
-	// 						cluster.worker.kill();
-	// 					}
-	// 				} else if (message.type === 'kill') {
-	// 					cluster.worker.kill();
-	// 				}
-	// 			};
-	// 			process.on('message', masterMessageHandler);
-	// 			//send message to start communication
-	// 			process.send({
-	// 				type: 'finish',
-	// 				from: cluster.worker.id,
-	// 				data: []
-	// 			});
-	// 		}
-	// 	}
-	// },
+		var addPosts = (url) => {
+			request(url, (err, res, html) => {
+				if (err) {
+					console.log(err);
+				} else {
+					var $ = cheerio.load(html);
+					filters.forEach((filter) => {
+						$(filter).empty();
+					});
+					var anchors = $('a');
+					for (var key in anchors) {
+						var blogPostUrl = getAndCheckUrl(anchors[key], url);
+						if (blogPostUrl && !added[blogPostUrl]) {
+							added[blogPostUrl] = true;
+							result.push(blogPostUrl);
+						}
+					}
+				}
+				count++;
+				if (count === urlList.length) {
+					callback(result);
+				}
+			});
+		};
+		urlList.forEach((url) => {
+			addPosts(url);
+		});
+	},
 	filterPosts: (urlList, callback) => {
 		var result = [];
 		var checked = [];
