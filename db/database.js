@@ -53,6 +53,13 @@ exports.Edges = sequelize.define('edges', {
 
 });
 
+exports.Authors = sequeslize.define('authors', {
+  name: {
+    type: Sequelize.STRING,
+    unique: true
+  }
+});
+
 //This table will improve lookup time on tags, and also will be quite necessary when
 //we want to start creating an indexing service. It will allow us to simply iterate through tags,
 //instead of a complex logic when visiting each entry. Additionally it may be useful for data scrubbing purposes
@@ -60,14 +67,15 @@ exports.Tags = sequelize.define('tags', {
   tag: {
     type: Sequelize.STRING,
     unique: true,
-  },
-  blogId: {
-    type: Sequelize.INTEGER,
-    unique: true,
-    primaryKey: true
   }
-
 });
+
+exports.Tags.belongsToMany(exports.Posts, {through: 'TagsPosts'});
+exports.Posts.belongsToMany(exports.Tags, {through: 'TagsPosts'});
+
+
+exports.Authors.belongsToMany(exports.Posts, {through: 'AuthorsPosts'});
+exports.Posts.belongsToMany(exports.Authors, {through: 'AuthorsPosts'});
 
 //Note: needs a many to many join table on post ID
 

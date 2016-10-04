@@ -5,6 +5,18 @@ var Promise = require('bluebird');
 
 exports.findOrCreateOne = function(postData, cb) {
 
+  var createdPost;
+  var createdAuthors;
+  var createdTags;
+
+  //create post
+    //if it was created, have to add many to many relations
+    //find or create all authors passed
+    //add those models to the post created with model.addAuthors(author_models)
+
+    //find or create all tags passed
+    //add those models to the post created with model.addTags(tag_models)
+
   Post.findOne({
     where: {
       url: postData.url,
@@ -25,6 +37,8 @@ exports.findOrCreateOne = function(postData, cb) {
     }
   }).then(function(created) {
     // console.log('Here: ', created);
+
+    //return created.addAuthors()
     if (created) {
       cb(null, created);
     }
