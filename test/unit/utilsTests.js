@@ -38,7 +38,7 @@ describe('Utilities', function() {
         //console.log(err, succ);
         expect(err).to.equal(null);
         expect(succ.dataValues.title).to.equal(fakePost.title);
-        expect(succ.tags).to.deep.equal(fakePost.tags);
+        expect(succ.oldTags).to.deep.equal(fakePost.tags);
         done();
       });
     });
@@ -170,7 +170,7 @@ describe('Utilities', function() {
         expect(updated).to.equal(undefined);
 
         expect(postToLink.title).to.equal(newEdgePost.title);
-        expect(postToLink.tags).to.deep.equal(newEdgePost.tags);
+        expect(postToLink.oldTags).to.deep.equal(newEdgePost.tags);
         done();
       });
     });

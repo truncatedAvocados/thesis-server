@@ -94,3 +94,5 @@ exports.WL = sequelize.define('whitelist', {
 //Ex: making a schema change by adding an author field
 //Only run this file once (cmd-B in sublime w/ node build).
 sequelize.sync();
+// sequelize.sync({force: true});
+

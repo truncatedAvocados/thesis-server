@@ -14,8 +14,6 @@ exports.findOrCreateOne = function(postData, cb) {
                       ? postData.author 
                       : [postData.author];
 
-  //create post
-    //if it was created, have to add many to many relations
     //find or create all authors passed
     //add those models to the post created with model.addAuthors(author_models)
 
@@ -27,8 +25,10 @@ exports.findOrCreateOne = function(postData, cb) {
       url: postData.url,
     }
   }).then(function(found) {
-    // console.log('I found a post: ', found);
+
     if (!found) {
+      //create post
+      //if it was created, have to add many to many relations
       return Post.create({
         url: postData.url,
         title: postData.title,
@@ -43,38 +43,42 @@ exports.findOrCreateOne = function(postData, cb) {
   }).then(function(created) {
 
     createdPost = created;
-    return Promise.all(postData.author.map(function(auth) {
-      return Authors.findOrCreate({
-        where: {
-          name: auth
-        }
-      }).spread();
-    }));
+    if (createdPost) {
+      return Promise.all(postData.author.map(function(auth) {
+        return Authors.findOrCreate({
+          where: {
+            name: auth
+          }
+        }).spread(function(authorFound, authorCreated) {
+          // console.log('Found: ', authorFound, 'Created: ', authorCreated);
+          return createdPost.addAuthor(authorFound ? authorFound : authorCreated);
+        });
+      }));
+    }
 
   }).then(function(authors) {
 
-    return createdPost.addAuthors(authors);
-
-  }).then(function(updated) {
-
-    return Promise.all(postData.tags.map(function(tag) {
-      return Authors.findOrCreate({
-        where: {
-          name: tag
-        }
-      }).spread();
-    }));
+    if (createdPost) {
+      return Promise.all(postData.tags.map(function(tag) {
+        return Tags.findOrCreate({
+          where: {
+            name: tag
+          }
+        }).spread(function(tagFound, tagCreated) {
+          console.log('Found: ', tagFound, 'Created: ', tagCreated);
+          return createdPost.addTag(tagFound ? tagFound : tagCreated);
+        });
+      }));
+    }
 
   }).then(function(tags) {
 
-    return createdPost.addTags(tags);
-
-  }).then(function(updated) {
-
-    cb(null, updated);
+    if (createdPost) {
+      cb(null, createdPost);
+    }
 
   }).catch(function(err) {
-    // console.log(err);
+    console.log(err);
     cb(err);
   });
 
@@ -128,7 +132,6 @@ exports.createOneWithEdge = function(postData, parentUrl, cb) {
         } else {
           cb(null, postToAddEdge);
         }
-     // }
 
       }).then(function(updated) {
         if (updated) {
