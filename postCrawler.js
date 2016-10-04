@@ -63,7 +63,7 @@ class PostCrawler {
 
   getBaseUrl(url) {
     const regex = new RegExp("^(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(\\?(?:[^#]*))?(#(‌​?:.*))?");
-    return regex.exec(url)[2];
+    return regex.exec(url)[4] ? null : regex.exec(url)[2];
   }
 
   setLinks() {
@@ -77,6 +77,8 @@ class PostCrawler {
 
     this.$('#content, #main, .post, .entry').find('a').each((i, elem) => {
       href = this.$(elem).attr('href');
+      // console.log('HREF: ', this.getBaseUrl(href));
+      // console.log('BASEURL: ', this.getBaseUrl(this.url));
       if (!redirectRegEx.test(href) && baseUrls[this.getBaseUrl(href)] && !urls[href] && this.getBaseUrl(href) != this.getBaseUrl(this.url)) {
         urls[href] = true;
         this.postInfo.links.push({

@@ -22,7 +22,8 @@ module.exports = {
 			});
 			var childMessageHandler = (message) => {
 				if (message.type = 'finish') {
-					crawled[message.data.url] = true;
+					message.count = message.count || message.from - 1;
+					crawled[urlList[message.count].url] = true;
 					urlList = urlList.concat(message.data);
 					urlCount++;
 					if (urlList[urlCount]) {
