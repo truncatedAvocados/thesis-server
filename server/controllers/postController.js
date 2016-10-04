@@ -1,30 +1,63 @@
 var db = require('../../db/database.js');
 var Post = db.Post;
 var Edges = db.Edges;
+var Authors = db.Authors;
+var Tags = db.Tags;
 var Promise = require('bluebird');
 
 //Finds one all posts matching a tag, sorting them by inLinks
 exports.findTags = function(req, res) {
 
-  orQuery = req.query.tags.map(tag => {
-    return { 
-      tags: {
-        $contains: [tag]
-      }
-    };
-  });
+  // Old query
+  // orQuery = req.query.tags.map(tag => {
+  //   return { 
+  //     oldTags: {
+  //       $contains: [tag]
+  //     }
+  //   };
+  // });
+  
+  // Post.findAll({
+  //   where: { 
+  //     $or: orQuery
+  //   }
+  // }).then(function(results) {
+  //   results.sort((a, b) => b.inLinks.length - a.inLinks.length);
+  //   res.json(results);
+  // }).catch(function(err) {
+  //   console.log('Error in find tags: ', err);
+  //   res.status(500).send(err);
+  // });
 
-  Post.findAll({
-    where: { 
-      $or: orQuery
-    }
+  var finalResults = [];
+
+  Tags.findAll({
+    where: {
+      name: {
+        in: req.query.tags
+      }
+    },
+    include: [{
+      model: Post
+    }]
   }).then(function(results) {
-    results.sort((a, b) => b.inLinks.length - a.inLinks.length);
-    res.json(results);
+    
+    results.forEach(tag => {
+      tag.posts.forEach(post => {
+        if (finalResults.map(one => one.postId).indexOf(post.postId) < 0) {
+          finalResults.push(post);
+        }
+      });
+    });
+    
+    finalResults.sort((a, b) => b.inLinks.length - a.inLinks.length);
+    res.json(finalResults);
+
   }).catch(function(err) {
-    console.log('Error in find tags: ', err);
+    console.log(err);
     res.status(500).send(err);
   });
+
 
 };
 
