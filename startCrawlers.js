@@ -2,7 +2,7 @@ const frontPageCrawler = require('./frontPageCrawler.js');
 const crawlUrl = require('./postCrawler').crawlUrl;
 const scheduler = require('./scheduler.js');
 const whitelist = require('./whitelist.json');
-const whiteListKeys = Object.keys(whitelist);
+const whiteListKeys = Object.keys(whitelist).slice(0, 10);
 
 
 if (process.argv.indexOf('--continue') > -1) {

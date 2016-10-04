@@ -24,6 +24,16 @@ var getAndCheckUrl = (anchor, baseUrl) => {
 	}
 };
 
+var isValid = (url) => {
+	var filters = ['/collections/', '/archives/', '/authors/', '/about/', '/search/', '/publication/', '/tags/'];
+	var regex = /^((http[s]?|ftp):\/)?\/?([^:\/\s]+)((\/\w+)*\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$/;
+
+	if (!regex.exec(url) || filters.indexOf(regex.exec(url)[4]) > -1) {
+		return false;
+	}
+	return true;
+};	
+
 module.exports = {
 	getPosts: (urlList, callback) => {
 		if (!urlList || urlList.length === 0) {
@@ -268,26 +278,28 @@ module.exports = {
 	getSiteMapsMulti: (urlList, callback) => {
 		if (cluster.isMaster) {
 			var urlCount = -1;
-			var result = {};
-			var workers = numCPUs * 2;
+			var result = [];
+			var sitemaps = [];
+			var workers = numCPUs * 2 < urlList.length ? numCPUs * 2 : urlList.length;
 			var childMessageHandler = (message) => {
 				if (message.type == 'ready') {
 					urlCount++;
-					var url = urlList[urlCount][urlList[urlCount].length - 1] === '/' ? urlList[urlCount] + 'sitemap.xml' : urlList[urlCount] + '/sitemap.xml';
 					cluster.workers[message.from].send({
 						type: 'start',
 						from: 'master',
-						url: url
+						url: urlList[urlCount]
 					});
 				} else if (message.type === 'finish') {
 					urlCount++;
-					var url = urlList[urlCount][urlList[urlCount].length - 1] === '/' ? urlList[urlCount] + 'sitemap.xml' : urlList[urlCount] + '/sitemap.xml';
-					result[message.url] = message.data;
+					if (message.siteMap) {
+						sitemaps.push(message.siteMap);
+					}
+					result = result.concat(message.result);
 					if (urlList[urlCount]) {
 						cluster.workers[message.from].send({
 							type: 'start',
 							from: 'master',
-							url: url
+							url: urlList[urlCount]
 						});
 					} else {
 						cluster.workers[message.from].send({
@@ -308,26 +320,47 @@ module.exports = {
 				workers--;
 				if (workers === 0) {
 					cluster.disconnect(() => {
-						callback(result);
+						callback(result, sitemaps);
 					});
 				}
 			});
 		} else {		
 			var getSiteMap = (url) => {
-				var result = {};
-				request(url, (err, res, xml) => {
+				var result = [];
+				var siteMapUrl = url[url.length - 1] === '/' ? url + 'sitemap.xml' : url + '/sitemap.xml';
+				request(siteMapUrl, (err, res, xml) => {
 					if (err) {
 						console.log(err);
 					} else {
+						var hasSiteMap = false;
 						var $ = cheerio.load(xml);
-						var urls = $('loc');
-						console.log(urls);
+						var urls = $('url');
+						urls.each((i, elem) => {
+							hasSiteMap = true;
+							if ($(elem).children('lastmod').length > 0) {
+								var postUrl = $(elem).children('loc').text().trim();
+								if (isValid(postUrl)) {
+									console.log(postUrl);
+									console.log($(elem).children('lastmod').text());
+									result.push(postUrl);
+								}
+							}
+						});
+					}
+					var siteMap;
+					if (hasSiteMap) {
+						siteMap = {
+							url: url,
+							siteMap: siteMapUrl
+						}
+					} else {
+						siteMap = false;
 					}
 					process.send({
 						type: 'finish',
 						from: cluster.worker.id,
-						data: result,
-						url: url
+						result: result,
+						siteMap: siteMap
 					});
 				});
 			};
@@ -351,3 +384,5 @@ module.exports = {
 	},
 };
 
+//things to filter out: collections, categories, archives, authors, homepage, about, robots.txt, search, publication, tags
+//common blog post patterns: .../posts/, .../blog/, .../long-name

@@ -21,8 +21,15 @@ module.exports = {
 				});
 			});
 			var childMessageHandler = (message) => {
-				if (message.type = 'finish') {
-					message.count = message.count || message.from - 1;
+				if (message.type === 'ready') {
+					urlCount++;
+					cluster.workers[message.from].send({
+						type: 'start',
+						from: 'master',
+						data: urlList[urlCount],
+						count: urlCount
+					});
+				} else if (message.type = 'finish') {
 					crawled[urlList[message.count].url] = true;
 					urlList = urlList.concat(message.data);
 					urlCount++;
@@ -42,14 +49,6 @@ module.exports = {
 							from: 'master'
 						});
 					}
-				} else if (message.type === 'ready') {
-						urlCount++;
-						cluster.workers[message.from].send({
-							type: 'start',
-							from: 'master',
-							data: urlList[urlCount],
-							count: urlCount
-						});
 				}
 			};
 			var createChild = () => {
