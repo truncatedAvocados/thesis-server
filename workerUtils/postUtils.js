@@ -65,7 +65,6 @@ exports.findOrCreateOne = function(postData, cb) {
             name: tag
           }
         }).spread(function(tagFound, tagCreated) {
-          console.log('Found: ', tagFound, 'Created: ', tagCreated);
           return createdPost.addTag(tagFound ? tagFound : tagCreated);
         });
       }));
