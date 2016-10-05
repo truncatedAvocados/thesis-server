@@ -16,12 +16,12 @@ if (process.argv.indexOf('--continue') > -1) {
     console.log('FRONT PAGE POSTS: ', results.length);
     frontPageCrawler.filterPosts(results, (filtered) => {
       console.log('FILTERED POSTS: ', filtered.length);
-      // scheduler.scheduleCrawlers(filtered, (time) => {
-      //   console.log(time - startTime);
-      // });
-      scheduler.scheduleCrawlersMulti(filtered, (time) => {
+      scheduler.scheduleCrawlers(filtered, (time) => {
         console.log(time - startTime);
       });
+      // scheduler.scheduleCrawlersMulti(filtered, (time) => {
+      //   console.log(time - startTime);
+      // });
     });
   });
 }

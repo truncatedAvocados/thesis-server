@@ -70,7 +70,7 @@ module.exports = {
 			});
 		}
 	},
-  scheduleCrawlers: (urlList, callback) => {
+  scheduleCrawlers: (urlList, callback, crawled) => {
   	if (urlList.length === 0) {
   		console.log('Finished');
   		callback(new Date().getTime());
@@ -90,16 +90,16 @@ module.exports = {
     });
 
     urlList.forEach((url) => {
-    	if (!crawled(url)) {
-    		crawled[url] = true;
-	    	crawlUrl(url, (links, index) => {
+    	crawlUrl(url, (links, index) => {
+    		if (!crawled[url]) {
+	    		crawled[url] = true;
 	    		result = result.concat(links);
-	    		count++;
-	    		if (count === urlList.length) {
-	    			scheduleCrawlers(result, callback, crawled);
-	    		}
-	    	});
-    	}
+	    	}
+	    	count++;
+    		if (count === urlList.length) {
+    			scheduleCrawlers(result, callback, crawled);
+    		}
+    	});
     });
   } 
 };
