@@ -29,7 +29,7 @@ var isValid = (url) => {
 	var filters = ['/collections/', '/archives/', '/authors/', '/about/', '/search/', '/publication/', '/tags/'];
 	var regex = /^((http[s]?|ftp):\/)?\/?([^:\/\s]+)((\/\w+)*\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$/;
 
-	if (!regex.exec(url) || filters.indexOf(regex.exec(url)[4]) > -1) {
+	if (!regex.exec(url) || filters.indexOf(regex.exec(url)[4]) > -1 || whiteList[url]) {
 		return false;
 	}
 	return true;
@@ -78,6 +78,8 @@ module.exports = {
 						if ($(elem).children('lastmod').length > 0) {
 							var postUrl = $(elem).children('loc').text().trim();
 							if (isValid(postUrl)) {
+								// console.log(postUrl);
+								// console.log($(elem).children('lastmod').text());
 								result.push(postUrl);
 							}
 						}
