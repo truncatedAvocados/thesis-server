@@ -12,7 +12,7 @@ var getAndCheckUrl = (anchor, baseUrl) => {
 		var blogPostUrl = anchor.attribs.href;
 		if (blogPostUrl) {
 			if (blogPostUrl[0] === '/') {
-				blogPostUrl = baseUrl + blogPostUrl;
+				blogPostUrl = baseUrl[baseUrl.length - 1] === '/' ? baseUrl + blogPostUrl.slice(1) : baseUrl + blogPostUrl;
 			}								
 			var regBlogUrl = blogPostUrl.replace(regex, '');
 			var regUrl = baseUrl.replace(regex, ''); 
