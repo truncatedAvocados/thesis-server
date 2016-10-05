@@ -38,7 +38,11 @@ exports.Post = sequelize.define('post', {
     defaultValue: []
   },
   author: Sequelize.STRING,
-  publishDate: Sequelize.DATE
+  publishDate: Sequelize.DATE,
+  rank: {
+    type: Sequelize.DOUBLE,
+    default: 0
+  }
 });
 
 //This table will be useful for traversing the graph bidirectionally (if it ends up being necessary)
@@ -57,6 +61,10 @@ exports.Authors = sequelize.define('authors', {
   name: {
     type: Sequelize.STRING,
     unique: true
+  },
+  hIndex: {
+    type: Sequelize.DOUBLE,
+    default: 0
   }
 });
 
@@ -67,7 +75,15 @@ exports.Tags = sequelize.define('tags', {
   name: {
     type: Sequelize.STRING,
     unique: true,
-  }
+  },
+  postRank: {
+    type: Sequelize.ARRAY(Sequelize.INTEGER),
+    defaultValue: []
+  },
+  authRank: {
+    type: Sequelize.ARRAY(Sequelize.INTEGER),
+    defaultValue: []
+  },
 });
 
 exports.Tags.belongsToMany(exports.Post, {through: 'TagsPosts'});
