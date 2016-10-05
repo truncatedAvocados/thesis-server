@@ -3,7 +3,10 @@ const request = require('./node_modules/request');
 const natural = require('./node_modules/natural');
 const stopwords = require('./node_modules/stopwords').english;
 const baseUrls = require('./baseUrls.json');
-const postUtils = require('./workerUtils/postUtils.js');
+const postUtils = require('./workerUtils/postUtils');
+const retext = require('retext');
+const nlcstToString = require('nlcst-to-string');
+const keywords = require('retext-keywords');
 
 class PostCrawler {
 
@@ -25,9 +28,7 @@ class PostCrawler {
   get(cb) {
     request(this.url, (err, response, body) => {
       if (err) {
-        console.log(err);
         cb(err, null);
-        // return;
       } else {
         this.$ = cheerio.load(body);
         this.setTitle();
@@ -70,21 +71,21 @@ class PostCrawler {
     // Remove redirects
     const redirectRegEx = /^\//;
     let href;
-    var urls = {};
+    const urls = {};
 
     // Remove old links
     this.postInfo.links = [];
 
-    this.$('#content, #main, .post, .entry').find('a').each((i, elem) => {
+    this.$('#content, #main, .post, .entry, .content').find('a').each((i, elem) => {
       href = this.$(elem).attr('href');
-      // console.log('HREF: ', this.getBaseUrl(href));
-      // console.log('BASEURL: ', this.getBaseUrl(this.url));
-      if (!redirectRegEx.test(href) && baseUrls[this.getBaseUrl(href)] && !urls[href] && this.getBaseUrl(href) != this.getBaseUrl(this.url)) {
+      if (!redirectRegEx.test(href) &&
+          baseUrls[this.getBaseUrl(href)] &&
+          !urls[href] &&
+          this.getBaseUrl(href) !== this.getBaseUrl(this.url)) {
         urls[href] = true;
         this.postInfo.links.push({
           parent: this.url,
-          url: href
-        });
+          url: href });
       }
     });
   }
@@ -94,12 +95,12 @@ class PostCrawler {
   }
 
   setTags() {
-    const TfIdf = natural.TfIdf;
-    const tfidf = new TfIdf();
     const anchors = this.$('a[rel=tag]');
     const punctRegEx = /[.,\/#!$%\^&\*;:{}=\-_`~()]/g;
+    const tokenizer = new natural.WordTokenizer();
     let tag;
     let p;
+    let body = '';
 
     // Remove old tags
     this.postInfo.tags = [];
@@ -114,18 +115,24 @@ class PostCrawler {
       });
     // Natural Language Process to assign tags
     } else {
-      this.$('#content, #main, .post, .entry').find('p').each((i, elem) => {
+      this.$('#content, #main, .post, .entry, .content').find('p').each((i, elem) => {
+        // Concat paragraphs together
         p = this.$(elem).text();
-        // tf-idf score
-        tfidf.addDocument(p);
+        body = body.concat('\n\n', p);
       });
 
-      tfidf.listTerms(0)
-        // Exclude stop words
-        .filter(item => stopwords.indexOf(item.term.toLowerCase()) === -1)
-        // Take the top 3 tags
-        .slice(0, 3)
-        .forEach(item => this.postInfo.tags.push(item.term));
+      // Tokenize post text
+      body = tokenizer.tokenize(body)
+        .map(word => word.toLowerCase())
+        // Remove stopwords
+        .filter(word => stopwords.indexOf(word) === -1);
+
+      // Find keywords
+      retext().use(keywords).process(body.join(' '), (err, file) => {
+        file.data.keywords
+          .map(word => nlcstToString(word.matches[0].node).toLowerCase())
+          .forEach(word => this.postInfo.tags.push(word));
+      });
     }
   }
 
@@ -164,7 +171,7 @@ class PostCrawler {
 
   setDesc() {
     const p =
-      this.$('#content, #main, .post, .entry')
+      this.$('#content, #main, .post, .entry, .content')
         .find('p')
         .first()
         .text()
@@ -179,21 +186,21 @@ exports.PostCrawler = PostCrawler;
 
 exports.crawlUrl = (options, cb) => {
   console.log('CRAWLING: ', options.url);
-  var crawler = new PostCrawler(options);
-  crawler.get((err, postInfo) => {
-    if (err) {
-      console.log(err);
+  const crawler = new PostCrawler(options);
+  crawler.get((errGet, postInfo) => {
+    if (errGet) {
+      console.log(errGet);
       cb([]);
     } else {
       cb(postInfo.links);
-      postUtils.createOneWithEdge(postInfo, crawler.parent, (err, found) => {
-        if (err) {
-          console.log(err);
+      postUtils.createOneWithEdge(postInfo, crawler.parent, (errEdge, found) => {
+        if (errEdge) {
+          console.log(errEdge);
         } else {
           console.log('STORED: ', found.dataValues.url);
         }
       });
     }
   });
-
 };
+
