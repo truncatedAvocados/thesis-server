@@ -142,13 +142,17 @@ class PostCrawler {
 
   setAuthor() {
     // Remove newline characters and tabs
-    const author = this.$('.author').text().replace(/\r?\n|\r|\t/g, '');
+    const authorTag = this.$('.author').text().replace(/\r?\n|\r|\t/g, '');
+    const authorRel = this.$('a[rel=author]').text().replace(/\r?\n|\r|\t/g, '');
     const urlRegEx = /^(http(s)?(:\/\/))?(www\.)?([a-zA-Z0-9-_\.]+)/gi;
 
     // Check for author tag
-    if (author.length > 0) {
+    if (authorRel.length > 0) {
       this.postInfo.author =
-        author.split(' ').filter(word => word.toLowerCase() !== 'by').join(' ').slice(0, 30);
+        authorRel.split(' ').filter(word => word.toLowerCase() !== 'by').join(' ').slice(0, 30);
+    } else if (authorTag.length > 0) {
+      this.postInfo.author =
+        authorTag.split(' ').filter(word => word.toLowerCase() !== 'by').join(' ').slice(0, 30);
     // Use the domain name for the author
     } else {
       this.postInfo.author = urlRegEx.exec(this.postInfo.url)[5];
