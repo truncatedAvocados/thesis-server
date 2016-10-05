@@ -3,7 +3,7 @@ var request = require('request');
 var cluster = require('cluster');
 var numCPUs = require('os').cpus().length;
 var postUtils = require('./workerUtils/postUtils.js');
-var whiteList = require('./newWhiteList');
+var whiteList = require('./whitelist.json');
 
 var getAndCheckUrl = (anchor, baseUrl) => {
 	var regex = /http\w*\:\/\/(www\.)?/i;
