@@ -79,6 +79,7 @@ module.exports = {
   	var scheduleCrawlers = module.exports.scheduleCrawlers;
     var count = 0;
     var result = [];
+    var crawled = crawled || {};
 
     ON_DEATH((signal, err) => {
     	fs.writeFile('queue.json', JSON.stringify(urlList.slice(count).concat(result)), (err) => {
@@ -89,13 +90,16 @@ module.exports = {
     });
 
     urlList.forEach((url) => {
-    	crawlUrl(url, (links, index) => {
-    		result = result.concat(links);
-    		count++;
-    		if (count === urlList.length) {
-    			scheduleCrawlers(result, callback);
-    		}
-    	});
+    	if (!crawled(url)) {
+    		crawled[url] = true;
+	    	crawlUrl(url, (links, index) => {
+	    		result = result.concat(links);
+	    		count++;
+	    		if (count === urlList.length) {
+	    			scheduleCrawlers(result, callback, crawled);
+	    		}
+	    	});
+    	}
     });
   } 
 };
