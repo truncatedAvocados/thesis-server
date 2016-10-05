@@ -30,7 +30,7 @@ describe('Controllers', function() {
         expect(response).to.have.length(2);
         expect(response.map(post => post.title)).to.deep.equal(['Working with Google Analytics', 'Google Analytics - sehr schon']);
         response.forEach(post => {
-          expect(post.tags).to.contain(tags[0]);
+          expect(post.oldTags).to.contain(tags[0]);
         });
         done();
       });

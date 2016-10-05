@@ -1,35 +1,83 @@
 var db = require('../db/database.js');
 var Post = db.Post;
 var Edges = db.Edges;
+var Authors = db.Authors;
+var Tags = db.Tags;
+
 var Promise = require('bluebird');
 
 exports.findOrCreateOne = function(postData, cb) {
+
+  var createdPost, createdAuthors, createdTags;
+
+  postData.author = postData.author instanceof Array 
+                      ? postData.author 
+                      : [postData.author];
+
+    //find or create all authors passed
+    //add those models to the post created with model.addAuthors(author_models)
+
+    //find or create all tags passed
+    //add those models to the post created with model.addTags(tag_models)
 
   Post.findOne({
     where: {
       url: postData.url,
     }
   }).then(function(found) {
-    // console.log('I found a post: ', found);
+
     if (!found) {
+      //create post
+      //if it was created, have to add many to many relations
       return Post.create({
         url: postData.url,
         title: postData.title,
-        tags: postData.tags,
+        oldTags: postData.tags,
         description: postData.desc,
-        author: postData.author,
+        author: postData.author[0],
         publishDate: postData.date
       });
     } else {
       cb(null, found);
     }
   }).then(function(created) {
-    // console.log('Here: ', created);
-    if (created) {
-      cb(null, created);
+
+    createdPost = created;
+    if (createdPost) {
+      return Promise.all(postData.author.map(function(auth) {
+        return Authors.findOrCreate({
+          where: {
+            name: auth
+          }
+        }).spread(function(authorFound, authorCreated) {
+          // console.log('Found: ', authorFound, 'Created: ', authorCreated);
+          return createdPost.addAuthor(authorFound ? authorFound : authorCreated);
+        });
+      }));
     }
+
+  }).then(function(authors) {
+
+    if (createdPost) {
+      return Promise.all(postData.tags.map(function(tag) {
+        return Tags.findOrCreate({
+          where: {
+            name: tag
+          }
+        }).spread(function(tagFound, tagCreated) {
+          return createdPost.addTag(tagFound ? tagFound : tagCreated);
+        });
+      }));
+    }
+
+  }).then(function(tags) {
+
+    if (createdPost) {
+      cb(null, createdPost);
+    }
+
   }).catch(function(err) {
-    // console.log(err);
+    console.log(err);
     cb(err);
   });
 
@@ -83,7 +131,6 @@ exports.createOneWithEdge = function(postData, parentUrl, cb) {
         } else {
           cb(null, postToAddEdge);
         }
-     // }
 
       }).then(function(updated) {
         if (updated) {
