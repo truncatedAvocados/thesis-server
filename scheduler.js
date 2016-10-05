@@ -72,15 +72,24 @@ module.exports = {
 	},
   scheduleCrawlers: (urlList, callback) => {
   	if (urlList.length === 0) {
-  		console.log('DONE');
+  		console.log('Finished');
   		callback(new Date().getTime());
   		return;
   	}
   	var scheduleCrawlers = module.exports.scheduleCrawlers;
     var count = 0;
     var result = [];
+
+    ON_DEATH((signal, err) => {
+    	fs.writeFile('queue.json', JSON.stringify(urlList.slice(count).concat(result)), (err) => {
+    		if (err) {
+    			console.log(err);
+    		}
+    	});
+    });
+
     urlList.forEach((url) => {
-    	crawlUrl(url, (links) => {
+    	crawlUrl(url, (links, index) => {
     		result = result.concat(links);
     		count++;
     		if (count === urlList.length) {

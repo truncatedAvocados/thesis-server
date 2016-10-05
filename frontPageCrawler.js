@@ -3,6 +3,7 @@ var request = require('request');
 var cluster = require('cluster');
 var numCPUs = require('os').cpus().length;
 var postUtils = require('./workerUtils/postUtils.js');
+var whiteList = require('./newWhiteList');
 
 var getAndCheckUrl = (anchor, baseUrl) => {
 	var regex = /http\w*\:\/\/(www\.)?/i;
@@ -36,44 +37,6 @@ var isValid = (url) => {
 
 module.exports = {
 	getPosts: (urlList, callback) => {
-		if (!urlList || urlList.length === 0) {
-			callback([]);
-		} else {
-			var result = [];			
-			var added = {};
-			var filters = ['header', 'footer', 'aside', 'nav', '.nav', '.navbar'];
-
-			var addPosts = (count) => {
-				var frontPageUrl = urlList[count];
-				request(frontPageUrl, (err, res, html) => {
-					if (err) {
-						console.log(err);
-					} else {
-						var $ = cheerio.load(html);
-						filters.forEach((filter) => {
-							$(filter).empty();
-						});
-						var anchors = $('a');
-						for (var key in anchors) {
-							var blogPostUrl = getAndCheckUrl(anchors[key], frontPageUrl);
-							if (blogPostUrl && !added[blogPostUrl]) {
-								added[blogPostUrl] = true;
-								result.push(blogPostUrl);
-							}
-						}
-					}
-					if (urlList[count + 1]) {
-						count ++;
-						addPosts(count);
-					} else {
-						callback(result);
-					}
-				});
-			};
-			addPosts(0);
-		}
-	},
-	getPosts2: (urlList, callback) => {
 		var result = [];			
 		var added = {};
 		var filters = ['header', 'footer', 'aside', 'nav', '.nav', '.navbar'];
@@ -103,8 +66,35 @@ module.exports = {
 				}
 			});
 		};
+		var addPostsSiteMap = (url) => {
+			request(url, (err, res, xml) => {
+				if (err) {
+					console.log(err);
+				} else {
+					var $ = cheerio.load(xml);
+					var urls = $('url');
+					urls.each((i, elem) => {
+						hasSiteMap = true;
+						if ($(elem).children('lastmod').length > 0) {
+							var postUrl = $(elem).children('loc').text().trim();
+							if (isValid(postUrl)) {
+								result.push(postUrl);
+							}
+						}
+					});
+				}
+				count++;
+				if (count === urlList.length) {
+					callback(result)
+				}
+			});
+		};
 		urlList.forEach((url) => {
-			addPosts(url);
+			if (whiteList[url] && whiteList[url].siteMap) {
+				addPostsSiteMap(whiteList[url].siteMap);
+			} else {
+				addPosts(url);
+			}
 		});
 	},
 	filterPosts: (urlList, callback) => {
