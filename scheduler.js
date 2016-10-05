@@ -70,7 +70,7 @@ module.exports = {
 			});
 		}
 	},
-  scheduleCrawlers: (urlList, callback) => {
+  scheduleCrawlers: (urlList, callback, crawled) => {
   	if (urlList.length === 0) {
   		console.log('Finished');
   		callback(new Date().getTime());
@@ -79,6 +79,7 @@ module.exports = {
   	var scheduleCrawlers = module.exports.scheduleCrawlers;
     var count = 0;
     var result = [];
+    var crawled = crawled || {};
 
     ON_DEATH((signal, err) => {
     	fs.writeFile('queue.json', JSON.stringify(urlList.slice(count).concat(result)), (err) => {
@@ -90,10 +91,13 @@ module.exports = {
 
     urlList.forEach((url) => {
     	crawlUrl(url, (links, index) => {
-    		result = result.concat(links);
-    		count++;
+    		if (!crawled[url]) {
+	    		crawled[url] = true;
+	    		result = result.concat(links);
+	    	}
+	    	count++;
     		if (count === urlList.length) {
-    			scheduleCrawlers(result, callback);
+    			scheduleCrawlers(result, callback, crawled);
     		}
     	});
     });
