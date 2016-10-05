@@ -1,5 +1,5 @@
 const assert = require('assert');
-const scheduler = require('../../scheduler').scheduleCrawlersSingle;
+const scheduler = require('../../scheduler').scheduleCrawlers;
 const PostCrawler = require('../../postCrawler');
 const links = require('../data/links').slice(0, 10);
 

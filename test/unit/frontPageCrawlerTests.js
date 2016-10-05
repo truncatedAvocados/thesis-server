@@ -66,13 +66,6 @@ describe('frontPageCrawler', function() {
         done();
       })
     });
-    it('should invoke a callback on an empty array with an invalid input', function(done) {
-      this.timeout(4000);
-      getPosts([], (result) => {
-        expect(result.length).to.equal(0);
-        done();
-      });
-    });
   });
 
 
