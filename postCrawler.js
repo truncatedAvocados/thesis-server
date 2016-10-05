@@ -76,7 +76,7 @@ class PostCrawler {
     // Remove old links
     this.postInfo.links = [];
 
-    this.$('#content, #main, .post, .entry').find('a').each((i, elem) => {
+    this.$('#content, #main, .post, .entry, .content').find('a').each((i, elem) => {
       href = this.$(elem).attr('href');
       if (!redirectRegEx.test(href) &&
           baseUrls[this.getBaseUrl(href)] &&
@@ -171,7 +171,7 @@ class PostCrawler {
 
   setDesc() {
     const p =
-      this.$('#content, #main, .post, .entry')
+      this.$('#content, #main, .post, .entry, .content')
         .find('p')
         .first()
         .text()
