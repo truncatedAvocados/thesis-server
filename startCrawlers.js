@@ -1,13 +1,14 @@
-const frontPageCrawler = require('./frontPageCrawler.js');
+const frontPageCrawler = require('./frontPageCrawler');
 const crawlUrl = require('./postCrawler').crawlUrl;
-const scheduler = require('./scheduler.js');
+const scheduler = require('./scheduler');
 const whitelist = require('./whitelist.json');
-const whiteListKeys = Object.keys(whitelist);
 
-var startTime = new Date().getTime();
+const whiteListKeys = Object.keys(whitelist);
+const startTime = new Date().getTime();
 
 if (process.argv.indexOf('--continue') > -1) {
-  var queue = require('./queue.json');
+  const queue = require('./queue.json');
+
   scheduler.scheduleCrawlersMulti(queue, (time) => {
     console.log(time - startTime);
   });
