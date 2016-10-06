@@ -139,8 +139,9 @@ class PostCrawler {
   }
 
   setAuthor() {
-    const authorTag = this.$('.author').first().text();
-    const authorRel = this.$('a[rel=author]').first().text();
+    // Remove newline characters and tabs
+    const authorTag = this.$('.author').first().text().replace(/\r?\n|\r|\t/g, '');
+    const authorRel = this.$('a[rel=author]').first().text().replace(/\r?\n|\r|\t/g, '');
     const urlRegEx = /^(http(s)?(:\/\/))?(www\.)?([a-zA-Z0-9-_\.]+)/gi;
     let author;
 
@@ -158,8 +159,7 @@ class PostCrawler {
     } else {
       this.postInfo.author =
         author
-          // Remove newline characters and tabs
-          .replace(/\r?\n|\r|\t/g, '').split(' ')
+          .split(' ')
           .filter(word => word.toLowerCase() !== 'by')
           .join(' ')
           .trim();
