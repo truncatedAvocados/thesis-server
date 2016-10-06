@@ -12,6 +12,22 @@ var Authors = db.Authors;
 var Tags = db.Tags;
 var Promise = require('bluebird');
 
+var findH = function(array) {
+
+  var h = array.length;
+
+  for (var i = 0; i < array.length; i++) {
+    if (i + 1 >= array[i].inLinks.length) {
+      h = Math.min(array[i].inLinks.length, i + 1);
+      break;
+    }
+  }
+
+  return h;
+  //see what's smaller, the max inlinks or the length of the array
+  //we know the array is sorted
+};
+
 exports.rankPosts = function(cb) {
   
   var start = new Date();
@@ -23,7 +39,7 @@ exports.rankPosts = function(cb) {
 
         posts.sort((a, b) => b.inLinks.length - a.inLinks.length);
 
-        return tag.updateAttributes({
+        return author.updateAttributes({
           postRank: posts.map(post => post.postId)
         });
       });
@@ -42,6 +58,28 @@ exports.rankPosts = function(cb) {
 
 };
 
-this.rankPosts((err, updated, time) => {
+exports.rankAuthors = function(cb) {
+
+  var start = new Date();
+
+  Authors.findAll().then(authResults =>{
+
+    return Promise.all(authResults.map(author => {
+      return author.getPosts().then(posts => {
+        return author.updateAttributes({
+          hIndex: findH(posts)
+        });
+      });
+    }));
+
+
+  });
+};
+
+// this.rankPosts((err, updated, time) => {
+//   console.log(time / 1000 + ' seconds');
+// });
+
+this.rankAuthors((err, updated, time) => {
   console.log(time / 1000 + ' seconds');
 });
