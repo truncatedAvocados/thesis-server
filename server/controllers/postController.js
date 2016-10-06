@@ -50,7 +50,7 @@ exports.findTags = function(req, res) {
     }
 
 
-    // Look at what page we are requesting
+    // Look at what page we are requesting, if necessary
     if (finalRanking.length > 20) {
       var start = req.query.page ? req.query.page * 20 - 1 : 0;
       //If no page was given we default to giving back the first 20 results
