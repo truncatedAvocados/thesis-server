@@ -139,21 +139,30 @@ class PostCrawler {
   }
 
   setAuthor() {
-    // Remove newline characters and tabs
-    const authorTag = this.$('.author').text().replace(/\r?\n|\r|\t/g, '');
-    const authorRel = this.$('a[rel=author]').text().replace(/\r?\n|\r|\t/g, '');
+    const authorTag = this.$('.author').first().text();
+    const authorRel = this.$('a[rel=author]').first().text();
     const urlRegEx = /^(http(s)?(:\/\/))?(www\.)?([a-zA-Z0-9-_\.]+)/gi;
+    let author;
 
-    // Check for author tag
+    // Check for author rel
     if (authorRel.length > 0) {
-      this.postInfo.author =
-        authorRel.split(' ').filter(word => word.toLowerCase() !== 'by').join(' ').slice(0, 30);
+      author = authorRel;
+    // Check for author tag
     } else if (authorTag.length > 0) {
-      this.postInfo.author =
-        authorTag.split(' ').filter(word => word.toLowerCase() !== 'by').join(' ').slice(0, 30);
+      author = authorTag;
+    }
+
     // Use the domain name for the author
-    } else {
+    if (author === undefined) {
       this.postInfo.author = urlRegEx.exec(this.postInfo.url)[5];
+    } else {
+      this.postInfo.author =
+        author
+          // Remove newline characters and tabs
+          .replace(/\r?\n|\r|\t/g, '').split(' ')
+          .filter(word => word.toLowerCase() !== 'by')
+          .join(' ')
+          .trim();
     }
   }
 
