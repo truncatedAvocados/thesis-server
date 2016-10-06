@@ -4,6 +4,7 @@ var Edges = db.Edges;
 var Authors = db.Authors;
 var Tags = db.Tags;
 var Promise = require('bluebird');
+var stable = require('stable');
 
 //Finds one all posts matching a tag, sorting them by inLinks
 exports.findTags = function(req, res) {
@@ -42,12 +43,19 @@ exports.findTags = function(req, res) {
       });
     });
 
-    console.log(finalRanking);
+    //Implement a stable sort to bring posts with most matching tags to the top
+    //But still in order relative to rankings
+    if (req.query.tags.length > 1) {
+      finalRanking = stable(finalRanking, (a, b) => b.count.length > a.count.length);
+    }
 
-    //Look at what page we are requesting
-    // if (finaRanking.length > 20) {
-    //   req.query.page ? 
-    // }
+
+    // Look at what page we are requesting
+    if (finalRanking.length > 20) {
+      var start = req.query.page ? req.query.page * 20 - 1 : 0;
+      //If no page was given we default to giving back the first 20 results
+      finalRanking = finalRanking.slice(start, start + 20);
+    }
 
     return Promise.all(finalRanking.map(function(onePost) {
       return Post.findOne({
