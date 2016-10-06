@@ -98,7 +98,7 @@ class PostCrawler {
     const anchors = this.$('a[rel=tag]');
     const punctRegEx = /[.,\/#!$%\^&\*;:{}=\-_`~()]/g;
     const tokenizer = new natural.WordTokenizer();
-    let tag;
+    let tags;
     let p;
     let body = '';
 
@@ -108,10 +108,8 @@ class PostCrawler {
     // Look for tag anchors
     if (anchors.length > 0) {
       anchors.each((i, elem) => {
-        tag = this.$(elem).text();
-        if (this.postInfo.tags.indexOf(tag) === -1) {
-          this.postInfo.tags.push(tag);
-        }
+        tags = this.$(elem).text().split(' ');
+        this.postInfo.tags = this.postInfo.tags.concat(tags);
       });
     // Natural Language Process to assign tags
     } else {
@@ -142,16 +140,29 @@ class PostCrawler {
 
   setAuthor() {
     // Remove newline characters and tabs
-    const author = this.$('.author').text().replace(/\r?\n|\r|\t/g, '');
+    const authorTag = this.$('.author').first().text().trim();
+    const authorRel = this.$('a[rel=author]').first().text().trim();
     const urlRegEx = /^(http(s)?(:\/\/))?(www\.)?([a-zA-Z0-9-_\.]+)/gi;
+    let author;
 
+    // Check for author rel
+    if (authorRel.length > 0) {
+      author = authorRel;
     // Check for author tag
-    if (author.length > 0) {
-      this.postInfo.author =
-        author.split(' ').filter(word => word.toLowerCase() !== 'by').join(' ').slice(0, 30);
+    } else if (authorTag.length > 0) {
+      author = authorTag;
+    }
+
     // Use the domain name for the author
-    } else {
+    if (author === undefined) {
       this.postInfo.author = urlRegEx.exec(this.postInfo.url)[5];
+    } else {
+      this.postInfo.author =
+        author
+          .split(' ')
+          .filter(word => word.toLowerCase() !== 'by')
+          .join(' ')
+          .trim();
     }
   }
 
