@@ -98,7 +98,7 @@ class PostCrawler {
     const anchors = this.$('a[rel=tag]');
     const punctRegEx = /[.,\/#!$%\^&\*;:{}=\-_`~()]/g;
     const tokenizer = new natural.WordTokenizer();
-    let tag;
+    let tags;
     let p;
     let body = '';
 
@@ -108,10 +108,8 @@ class PostCrawler {
     // Look for tag anchors
     if (anchors.length > 0) {
       anchors.each((i, elem) => {
-        tag = this.$(elem).text();
-        if (this.postInfo.tags.indexOf(tag) === -1) {
-          this.postInfo.tags.push(tag);
-        }
+        tags = this.$(elem).text().split(' ');
+        this.postInfo.tags = this.postInfo.tags.concat(tags);
       });
     // Natural Language Process to assign tags
     } else {
