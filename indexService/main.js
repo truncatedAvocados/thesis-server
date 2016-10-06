@@ -28,20 +28,78 @@ var findH = function(array) {
   //we know the array is sorted
 };
 
-exports.rankPosts = function(cb) {
+// exports.rankPosts = function(cb) {
   
+//   var start = new Date();
+
+//   Tags.findAll().then(tagResults => {
+
+//     return Promise.all(tagResults.map(tag => {
+//       return tag.getPosts().then(posts => {
+
+//         posts.sort((a, b) => b.inLinks.length - a.inLinks.length);
+
+//         return tag.updateAttributes({
+//           postRank: posts.map(post => post.postId)
+//         });
+//       });
+//     }));
+
+//   }).then(updated => {
+
+//     var end = new Date();
+//     cb(null, updated, end - start);
+
+//   }).catch(err => {
+
+//     cb(err);
+
+//   });
+
+// };
+
+// exports.rankAuthors = function(cb) {
+
+//   var start = new Date();
+
+//   Authors.findAll().then(authResults =>{
+
+//     return Promise.all(authResults.map(author => {
+//       return author.getPosts().then(posts => {
+
+//         posts.sort((a, b) => b.inLinks.length - a.inLinks.length);
+//         return author.updateAttributes({
+//           hIndex: findH(posts)
+//         });
+//       });
+//     }));
+
+//   }).then(updated => {
+
+//     var end = new Date();
+//     cb(null, updated, end - start);
+
+//   }).catch(err => {
+
+//     cb(err);
+
+//   });
+// };
+
+rank = function(Model, attr, rankingFunc, cb) {
+
   var start = new Date();
 
-  Tags.findAll().then(tagResults => {
+  Model.findAll().then(results => {
 
-    return Promise.all(tagResults.map(tag => {
-      return tag.getPosts().then(posts => {
+    return Promise.all(results.map(instance => {
+      return instance.getPosts().then(posts => {
 
         posts.sort((a, b) => b.inLinks.length - a.inLinks.length);
 
-        return author.updateAttributes({
-          postRank: posts.map(post => post.postId)
-        });
+        var obj = {};
+        obj[attr] = rankingFunc(posts);
+        return instance.updateAttributes(obj);
       });
     }));
 
@@ -59,27 +117,24 @@ exports.rankPosts = function(cb) {
 };
 
 exports.rankAuthors = function(cb) {
-
-  var start = new Date();
-
-  Authors.findAll().then(authResults =>{
-
-    return Promise.all(authResults.map(author => {
-      return author.getPosts().then(posts => {
-        return author.updateAttributes({
-          hIndex: findH(posts)
-        });
-      });
-    }));
-
-
-  });
+  //We fetch all authors, get their related posts, sort them, then use the sorted array to
+  //find and assign their h-index score
+  rank(Authors, 'hIndex', findH, cb);
 };
 
-// this.rankPosts((err, updated, time) => {
-//   console.log(time / 1000 + ' seconds');
-// });
+exports.rankPosts = function(cb) {
+  //We fetch all tags, then get their related posts, then get their postIds and
+  //then update the tag "postRank" attribute to a list of post Ids
+  rank(Tags, 'postRank', (posts) => posts.map(post => post.postId), cb);
+};
 
-this.rankAuthors((err, updated, time) => {
+
+//TESTING THE METHODS
+
+this.rankPosts((err, updated, time) => {
   console.log(time / 1000 + ' seconds');
 });
+
+// this.rankAuthors((err, updated, time) => {
+//   console.log(time / 1000 + ' seconds');
+// });
