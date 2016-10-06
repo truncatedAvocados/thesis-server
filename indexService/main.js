@@ -43,5 +43,5 @@ exports.rankPosts = function(cb) {
 };
 
 this.rankPosts((err, updated, time) => {
-  console.log(time);
+  console.log(time / 1000 + ' seconds');
 });
