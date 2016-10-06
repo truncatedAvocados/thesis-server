@@ -140,8 +140,8 @@ class PostCrawler {
 
   setAuthor() {
     // Remove newline characters and tabs
-    const authorTag = this.$('.author').first().text().replace(/\r?\n|\r|\t/g, '');
-    const authorRel = this.$('a[rel=author]').first().text().replace(/\r?\n|\r|\t/g, '');
+    const authorTag = this.$('.author').first().text().trim();
+    const authorRel = this.$('a[rel=author]').first().text().trim();
     const urlRegEx = /^(http(s)?(:\/\/))?(www\.)?([a-zA-Z0-9-_\.]+)/gi;
     let author;
 
