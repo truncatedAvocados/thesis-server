@@ -22,8 +22,7 @@ exports.findTags = function(req, res) {
     //We need to write some logic around combinations of tags and weights of tags
     //For now, we'll give back the posts that contained the most overlap first
     //Subsorted by inLinks
-
-
+    
     var finalRanking = [];
 
     //Building up intermediate array, so we can use some sorting logic around tags and rank later on
@@ -108,27 +107,4 @@ exports.findOne = function(req, res) {
   });
 
 };
-
-
-
-// Old query for FIND TAGS
-// orQuery = req.query.tags.map(tag => {
-//   return { 
-//     oldTags: {
-//       $contains: [tag]
-//     }
-//   };
-// });
-
-// Post.findAll({
-//   where: { 
-//     $or: orQuery
-//   }
-// }).then(function(results) {
-//   results.sort((a, b) => b.inLinks.length - a.inLinks.length);
-//   res.json(results);
-// }).catch(function(err) {
-//   console.log('Error in find tags: ', err);
-//   res.status(500).send(err);
-// });
 
