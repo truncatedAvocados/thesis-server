@@ -12,7 +12,7 @@ var Edges = db.Edges;
 var Authors = db.Authors;
 var Tags = db.Tags;
 var Promise = require('bluebird');
-
+const math = require('mathjs');
 
 //This ranking function is for getting the h-factor of an author, as defined here:
 //https://en.wikipedia.org/wiki/H-index
@@ -41,8 +41,8 @@ var sortAuthors = function(posts) {
   posts.forEach(post => {
     //get at authors for each post
     post.authors.forEach(author => {
-      
-      var i = results.map(result => result.id).indexOf(author.id); 
+
+      var i = results.map(result => result.id).indexOf(author.id);
       //if its in our results array already
       if (i !== -1) {
         results[i].count++;
@@ -58,7 +58,7 @@ var sortAuthors = function(posts) {
   //filter out authors who have less than 5 posts on the subject
   results = results.filter(result => result.count > 4);
   // console.log('Post-filter: ', results.map(result => result.id));
-  //sort the results by highest h-index first 
+  //sort the results by highest h-index first
   results.sort((a, b) => b.hIndex - a.hIndex);
   // console.log('Post-sorting: ', results.map(result => result.id), results.map(result => result.hIndex));
   //return a mapped array of just their ids
@@ -114,7 +114,7 @@ var rankAuthors = function(cb) {
 var rankPosts = function(cb) {
   //We fetch all tags, then get their related posts, then get their postIds and
   //then update the tag "postRank" attribute to a list of post Ids
-  
+
   //building up the args
   var attrs = {
     postRank: (posts) => posts.map(post => post.postId),
