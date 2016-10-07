@@ -4,30 +4,10 @@ var Edges = db.Edges;
 var Authors = db.Authors;
 var Tags = db.Tags;
 var Promise = require('bluebird');
+var stable = require('stable');
 
 //Finds one all posts matching a tag, sorting them by inLinks
 exports.findTags = function(req, res) {
-
-  // Old query
-  // orQuery = req.query.tags.map(tag => {
-  //   return { 
-  //     oldTags: {
-  //       $contains: [tag]
-  //     }
-  //   };
-  // });
-  
-  // Post.findAll({
-  //   where: { 
-  //     $or: orQuery
-  //   }
-  // }).then(function(results) {
-  //   results.sort((a, b) => b.inLinks.length - a.inLinks.length);
-  //   res.json(results);
-  // }).catch(function(err) {
-  //   console.log('Error in find tags: ', err);
-  //   res.status(500).send(err);
-  // });
 
   var finalResults = [];
 
@@ -36,23 +16,56 @@ exports.findTags = function(req, res) {
       name: {
         in: req.query.tags
       }
-    },
-    include: [{
-      model: Post
-    }]
-  }).then(function(results) {
+    }
+  }).then(function(tags) {
     
-    results.forEach(tag => {
-      tag.posts.forEach(post => {
-        if (finalResults.map(one => one.postId).indexOf(post.postId) < 0) {
-          finalResults.push(post);
+    //We need to write some logic around combinations of tags and weights of tags
+    //For now, we'll give back the posts that contained the most overlap first
+    //Subsorted by inLinks
+    
+    var finalRanking = [];
+
+    //Building up intermediate array, so we can use some sorting logic around tags and rank later on
+    tags.forEach(tag => {
+      tag.postRank.forEach(postId => {
+
+        var i = finalRanking.map(one => one.postId).indexOf(postId);
+        if (i < 0) {
+          finalRanking.push({
+            postId: postId,
+            count: [tag]
+          });
+        } else {
+          finalRanking[i].count.push(tag);
         }
+
       });
     });
-    
-    finalResults.sort((a, b) => b.inLinks.length - a.inLinks.length);
-    res.json(finalResults);
 
+    //Implement a stable sort to bring posts with most matching tags to the top
+    //But still in order relative to rankings
+    if (req.query.tags.length > 1) {
+      finalRanking = stable(finalRanking, (a, b) => b.count.length > a.count.length);
+    }
+
+
+    // Look at what page we are requesting, if necessary
+    if (finalRanking.length > 20) {
+      var start = req.query.page ? req.query.page * 20 - 1 : 0;
+      //If no page was given we default to giving back the first 20 results
+      finalRanking = finalRanking.slice(start, start + 20);
+    }
+
+    return Promise.all(finalRanking.map(function(onePost) {
+      return Post.findOne({
+        where: {
+          postId: onePost.postId
+        }
+      });
+    }));
+
+  }).then(function(results) {
+    res.json(results);
   }).catch(function(err) {
     console.log(err);
     res.status(500).send(err);

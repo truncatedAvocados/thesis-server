@@ -41,6 +41,7 @@
     "retext": "^4.0.0",
     "retext-keywords": "^3.0.0",
     "sequelize": "^3.24.3",
+    "stable": "^0.1.5",
     "stopword": "^0.1.1",
     "stopwords": "0.0.5"
   },

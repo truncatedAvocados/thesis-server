@@ -1,4 +1,4 @@
-var db = require('../db/database.js');
+var db = require('../../db/database.js');
 var Post = db.Post;
 var Edges = db.Edges;
 var Authors = db.Authors;
