@@ -99,7 +99,7 @@ var rank = function(Model, attrs, cb, options) {
 
 };
 
-exports.rankAuthors = function(cb) {
+var rankAuthors = function(cb) {
   //We fetch all authors, get their related posts, sort them, then use the sorted array to
   //find and assign their h-index score
   var attrs = {
@@ -109,7 +109,7 @@ exports.rankAuthors = function(cb) {
   rank(Authors, attrs, cb);
 };
 
-exports.rankPosts = function(cb) {
+var rankPosts = function(cb) {
   //We fetch all tags, then get their related posts, then get their postIds and
   //then update the tag "postRank" attribute to a list of post Ids
   
@@ -133,11 +133,11 @@ exports.initRebalance = function(cb) {
   //re-computing PageRank should come first, then re-make the rankings using values from PageRank
 
 
-  this.rankAuthors((err, updatedAuthors, time) => {
+  rankAuthors((err, updatedAuthors, time) => {
 
     console.log('Time to assign h-index to author: ', time / 1000 + ' seconds');
     //now we have each author and their h-index
-    this.rankPosts((err, updatedTags, time) => {
+    rankPosts((err, updatedTags, time) => {
 
       console.log('Time to rank posts and authors and add lists to tags: ', time / 1000 + ' seconds');
       console.log('\nUpdated Author: ', updatedAuthors.length, '\nUpdated Tag: ', updatedTags.length);
@@ -149,6 +149,6 @@ exports.initRebalance = function(cb) {
 
 //TESTING THE METHODS
 
-this.initRebalance(() => {
-  console.log('\nDONE');
-});
+// this.initRebalance(() => {
+//   console.log('\nDONE');
+// });

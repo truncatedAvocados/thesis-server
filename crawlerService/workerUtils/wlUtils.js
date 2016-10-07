@@ -1,4 +1,4 @@
-var db = require('../db/database.js');
+var db = require('../../db/database.js');
 var WL = db.WL;
 var Promise = require('bluebird');
 
