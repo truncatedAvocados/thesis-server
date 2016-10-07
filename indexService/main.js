@@ -65,6 +65,14 @@ var sortAuthors = function(posts) {
   return results.map(result => result.id);
 };
 
+// Page Rank
+const rankPages = (cb) => {
+  Post.findAndCountAll().then(result => {
+    return cb(result.count);
+  }).catch(err => cb(err));
+};
+
+
 //attrs is an object of attributes and the ranking functions used to calculate their values
 //options is used when fetching posts from tags in order to include authors for author ranking
 var rank = function(Model, attrs, cb, options) {
@@ -149,6 +157,7 @@ exports.initRebalance = function(cb) {
   });
 };
 
+exports.rankPages = rankPages;
 //TESTING THE METHODS
 
 // this.initRebalance(() => {
