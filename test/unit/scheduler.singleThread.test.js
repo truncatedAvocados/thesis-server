@@ -1,6 +1,6 @@
 const assert = require('assert');
-const scheduler = require('../../scheduler').scheduleCrawlers;
-const PostCrawler = require('../../postCrawler');
+const scheduler = require('../../crawlerService/scheduler').scheduleCrawlers;
+const PostCrawler = require('../../crawlerService/postCrawler');
 const links = require('../data/links').slice(0, 10);
 
 describe('Single Thread Scheduler Tests', () => {

@@ -1,6 +1,6 @@
 var expect = require('chai').expect;
-var postUtil = require('../../workerUtils/postUtils.js');
-var wlUtil = require('../../workerUtils/wlUtils.js');
+var postUtil = require('../../crawlerService/workerUtils/postUtils.js');
+var wlUtil = require('../../crawlerService/workerUtils/wlUtils.js');
 var Promise = require('bluebird');
 
 

@@ -1,5 +1,5 @@
 var expect = require('chai').expect;
-var frontPageCrawler = require('../../frontPageCrawler');
+var frontPageCrawler = require('../../crawlerService/frontPageCrawler');
 var getPostsMulti = frontPageCrawler.getPostsMulti;
 var getPosts = frontPageCrawler.getPosts;  
 
