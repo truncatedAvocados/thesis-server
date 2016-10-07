@@ -1,7 +1,6 @@
 //Main.js file
 
-//Useful SQL queries!!
-
+//Useful SQL queries
 //select count(*) from posts;
 //select "inLinks", title, url  from posts where array_length("inLinks",1) > 0 order by array_length("inLinks",1) desc;
 
@@ -12,7 +11,11 @@ var Authors = db.Authors;
 var Tags = db.Tags;
 var Promise = require('bluebird');
 
+
+//This ranking function is for getting the h-factor of an author, as defined here:
+//https://en.wikipedia.org/wiki/H-index
 var findH = function(array) {
+
   //Assume the input array is sorted (algo doesn't work otherwise)
   var h = array.length;
 
@@ -26,6 +29,9 @@ var findH = function(array) {
   return h;
 };
 
+//This ranking function checks all the authors for a list of posts assigned to one tag,
+//and gives back the ranking of authors by hIndex, but only if they have more than
+// 5 articles in that tag
 var sortAuthors = function(posts) {
 
   var results = [];
@@ -58,6 +64,7 @@ var sortAuthors = function(posts) {
 };
 
 //attrs is an object of attributes and the ranking functions used to calculate their values
+//options is used when fetching posts from tags in order to include authors for author ranking
 var rank = function(Model, attrs, cb, options) {
 
   var start = new Date();
@@ -67,6 +74,7 @@ var rank = function(Model, attrs, cb, options) {
     return Promise.all(results.map(instance => {
       return instance.getPosts(options).then(posts => {
 
+        //FOR PETE - CHANGE THIS TO SORT ON b.rank - a.rank ONCE PAGERANK IS IMPLEMENTED
         posts.sort((a, b) => b.inLinks.length - a.inLinks.length);
 
         var obj = {};
@@ -94,8 +102,11 @@ var rank = function(Model, attrs, cb, options) {
 exports.rankAuthors = function(cb) {
   //We fetch all authors, get their related posts, sort them, then use the sorted array to
   //find and assign their h-index score
-  rank(Authors, { hIndex: findH }, cb);
-  // rank(Authors, 'hIndex', findH, cb);
+  var attrs = {
+    hIndex: findH
+  };
+
+  rank(Authors, attrs, cb);
 };
 
 exports.rankPosts = function(cb) {
@@ -116,7 +127,11 @@ exports.rankPosts = function(cb) {
 };
 
 
-exports.tagAuthors = function(cb) {
+exports.initRebalance = function(cb) {
+
+  //FOR PETE:
+  //re-computing PageRank should come first, then re-make the rankings using values from PageRank
+
 
   this.rankAuthors((err, updatedAuthors, time) => {
 
@@ -127,54 +142,13 @@ exports.tagAuthors = function(cb) {
       console.log('Time to rank posts and authors and add lists to tags: ', time / 1000 + ' seconds');
       console.log('\nUpdated Author: ', updatedAuthors.length, '\nUpdated Tag: ', updatedTags.length);
 
-      Promise.all(updatedTags.map(tag => {
-        
-        //transform each tag into a list of sorted authors
-
-        return tag.getPosts().then(posts => {
-
-          return Promise.all(posts.map(post => {
-            return post.getAuthors();
-          }));
-
-        }).then((authorArray) => {
-          console.log(authorArray[0]);
-        }).catch((err) => {
-
-        });
-      }));
-
+      cb();
     });
   });
 };
 
 //TESTING THE METHODS
 
-this.rankPosts((err, updated, time) => {
-  console.log(time / 1000 + ' seconds');
+this.initRebalance(() => {
+  console.log('\nDONE');
 });
-
-// this.rankAuthors((err, updated, time) => {
-//   console.log(time / 1000 + ' seconds');
-// });
-
-// this.tagAuthors();
-// Tags.findAll().then((updatedTags) => {
-
-//   Promise.all(updatedTags.map(tag => {
-    
-
-//     //This tag variable is the thing we will eventually update    
-//     //transform each tag into a list of sorted authors
-
-//     return tag.getPosts({
-//       include: [Authors]
-//     }).then(posts => {
-//       savePosts = posts;
-//       console.log(posts[0]);
-//     }).catch((err) => {
-
-//     });
-//   }));
-
-// });
