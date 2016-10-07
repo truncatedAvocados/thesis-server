@@ -1,6 +1,6 @@
 var router = require('express').Router();
 var postController = require('./controllers/postController');
-
+var authController = require('./controllers/authController');
 
 router.get('/posts', function(req, res) {
   console.log('In the GET query for blog posts route: ', req.query.tags);
@@ -17,12 +17,15 @@ router.get('/posts/:number', function(req, res) {
 
 router.get('/authors', function(req, res) {
   console.log('In the GET query for authors route');
-  postController.retrieveOne(req, res, req.number);
+  if (req.query.tags) {
+    req.query.tags = JSON.parse(req.query.tags);
+  }
+  authController.findTags(req, res, req.number);
 });
 
 router.get('/authors/:number', function(req, res) {
   console.log('In the GET query for an individual author route: ', req.params.number);
-  postController.retrieveOne(req, res);
+  authController.findOne(req, res);
 });
 
 module.exports = router;
