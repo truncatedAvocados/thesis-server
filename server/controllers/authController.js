@@ -1,5 +1,6 @@
 var db = require('../../db/database.js');
 var Post = db.Post;
+var Edges = db.Edges;
 var Authors = db.Authors;
 var Tags = db.Tags;
 var Promise = require('bluebird');
@@ -11,9 +12,10 @@ var query = require('../utils/tagQuery.js');
 exports.findTags = function(req, res) {
 
   var options = {
-    tagRank: 'postRank',
-    model: Post,
-    id: 'postId'
+    tagRank: 'authRank',
+    model: Authors,
+    id: 'id',
+    include: [Post]
   };
 
   query(req, res, options);
@@ -24,28 +26,18 @@ exports.findTags = function(req, res) {
 //Finds one post, then finds all info for links to it.
 exports.findOne = function(req, res) {
 
-  Post.findOne({
+  Authors.findOne({
     where: {
-      postId: req.params.number
-    }
+      id: req.params.number
+    },
+    include: [Post]
   }).then(function(result) {
 
     //Get all of these infos
-    var linkedPosts = result.inLinks;
-
-    return Promise.all(linkedPosts.map(function(linkId) {
-      return Post.findOne({
-        where: {
-          postId: linkId
-        }
-      });
-    }));
-
-  }).then(function(inLinks) {
-
-    //TODO: change this to rank once PR is implemented
-    inLinks.sort((a, b) => b.inLinks.length - a.inLinks.length);
-    res.send(inLinks);
+    console.log(result);
+    var authorPosts = result.posts;
+    authorPosts.sort((a, b) => b.inLinks.length - a.inLinks.length);
+    res.send(authorPosts);
 
   }).catch(function(err) {
 
