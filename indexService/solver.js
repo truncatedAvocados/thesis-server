@@ -29,13 +29,13 @@ const normColumns = (matrix, p) => {
 };
 
 const makeAdjacencyMatrix = (nodes, n) => {
-  const adj = math.matrix(math.zeros([n, n]));
+  const adj = math.zeros(n, n, 'sparse');
 
   nodes.forEach((node) => {
     // Node contains in links
     node.inLinks.forEach((link) => {
       // Add edge
-      adj.subset(math.index(link.postId, node.postId), 1);
+      adj.set([link, node.postId], 1);
     });
   });
 
@@ -44,7 +44,7 @@ const makeAdjacencyMatrix = (nodes, n) => {
 
 const solver = (M, d, error) => {
   const N = M.size()[1];
-  const ones = math.ones(N, N);
+  const ones = math.ones(N, N, 'sparse');
 
   // Vector of ranks for the ith node, scaled between [0, 1]
   let v = math.zeros(N, 1).map((value, index) => Math.random());
