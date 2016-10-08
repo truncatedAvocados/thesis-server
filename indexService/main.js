@@ -65,11 +65,25 @@ var sortAuthors = function(posts) {
   return results.map(result => result.id);
 };
 
+const makeAdjacencyMatrix = (nodes, n) => {
+  const adj = math.matrix(math.zeros([n, n]));
+
+  nodes.forEach((node) => {
+    // Node contains in links
+    node.inLinks.foreach((link) => {
+      // Add edge
+      adj[link.postId][node.postId] = 1;
+    });
+  });
+
+  return adj;
+};
+
 // Page Rank
 const rankPages = (cb) => {
-  Post.findAndCountAll().then(result => {
-    return cb(result.count);
-  }).catch(err => cb(err));
+  Post.findAndCountAll()
+    .then((result) => { cb(result.count); })
+    .catch(err => cb(err));
 };
 
 
