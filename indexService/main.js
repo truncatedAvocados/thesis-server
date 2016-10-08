@@ -93,6 +93,15 @@ const makeAdjacencyMatrix = (nodes, n) => {
   return adj;
 };
 
+// p-norm
+const norm = (v, p) => {
+  let sum = 0;
+
+  v.forEach((x) => { sum += Math.pow(Math.abs(x), p); });
+
+  return Math.pow(sum, 1 / p);
+};
+
 // Page Rank
 const rankPages = (cb) => {
   Post.findAndCountAll()
