@@ -66,12 +66,13 @@ var sortAuthors = function(posts) {
 };
 
 const normColumns = (matrix) => {
-  const nCols = math.size(matrix)[1];
-  const index = math.index(math.range(0, nCols));
+  const nCols = matrix.size()[1];
+  let index;
   let col;
 
   for (let j = 0; j < nCols; j += 1) {
-    col = matrix.subset(index, j);
+    index = math.index(math.range(0, nCols), j);
+    col = matrix.subset(index);
     matrix.subset(index, math.multiply(col, 1 / math.sum(col)));
   }
 
