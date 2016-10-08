@@ -24,13 +24,13 @@ const normColumns = (matrix, p) => {
 };
 
 const makeAdjacencyMatrix = (nodes, n) => {
-  const adj = math.matrix(math.zeros([n, n]));
+  const adj = math.zeros([n, n]);
 
   nodes.forEach((node) => {
     // Node contains in links
     node.inLinks.forEach((link) => {
       // Add edge
-      adj[link.postId][node.postId] = 1;
+      adj.subset(math.index(link.postId, node.postId), 1);
     });
   });
 
