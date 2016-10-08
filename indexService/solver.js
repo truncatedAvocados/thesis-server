@@ -1,6 +1,15 @@
 const math = require('mathjs');
 
-const normColumns = (matrix) => {
+// p-norm
+const norm = (v, p) => {
+  let sum = 0;
+
+  v.forEach((x) => { sum += Math.pow(Math.abs(x), p); });
+
+  return Math.pow(sum, 1 / p);
+};
+
+const normColumns = (matrix, p) => {
   const nCols = matrix.size()[1];
   let index;
   let col;
@@ -8,7 +17,7 @@ const normColumns = (matrix) => {
   for (let j = 0; j < nCols; j += 1) {
     index = math.index(math.range(0, nCols), j);
     col = matrix.subset(index);
-    matrix.subset(index, math.multiply(col, 1 / math.sum(col)));
+    matrix.subset(index, math.multiply(col, 1 / norm(col, p)));
   }
 
   return matrix;
@@ -26,15 +35,6 @@ const makeAdjacencyMatrix = (nodes, n) => {
   });
 
   return adj;
-};
-
-// p-norm
-const norm = (v, p) => {
-  let sum = 0;
-
-  v.forEach((x) => { sum += Math.pow(Math.abs(x), p); });
-
-  return Math.pow(sum, 1 / p);
 };
 
 const solver = (M, d, error) => {
