@@ -12,19 +12,24 @@ const norm = (v, p) => {
 const normColumns = (matrix, p) => {
   const nCols = matrix.size()[1];
   let index;
+  let scale;
   let col;
 
   for (let j = 0; j < nCols; j += 1) {
     index = math.index(math.range(0, nCols), j);
     col = matrix.subset(index);
-    matrix.subset(index, math.multiply(col, 1 / norm(col, p)));
+    scale = norm(col, p);
+
+    if (scale > 0) {
+      matrix.subset(index, math.multiply(col, 1 / scale));
+    }
   }
 
   return matrix;
 };
 
 const makeAdjacencyMatrix = (nodes, n) => {
-  const adj = math.zeros([n, n]);
+  const adj = math.matrix(math.zeros([n, n]));
 
   nodes.forEach((node) => {
     // Node contains in links
