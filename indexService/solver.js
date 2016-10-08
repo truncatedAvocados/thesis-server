@@ -28,7 +28,7 @@ const makeAdjacencyMatrix = (nodes, n) => {
 
   nodes.forEach((node) => {
     // Node contains in links
-    node.inLinks.foreach((link) => {
+    node.inLinks.forEach((link) => {
       // Add edge
       adj[link.postId][node.postId] = 1;
     });
