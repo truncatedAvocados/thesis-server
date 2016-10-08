@@ -65,6 +65,19 @@ var sortAuthors = function(posts) {
   return results.map(result => result.id);
 };
 
+const normColumns = (matrix) => {
+  const nCols = math.size(matrix)[1];
+  const index = math.index(math.range(0, nCols));
+  let col;
+
+  for (let j = 0; j < nCols; j += 1) {
+    col = matrix.subset(index, j);
+    matrix.subset(index, math.multiply(col, 1 / math.sum(col)));
+  }
+
+  return matrix;
+};
+
 const makeAdjacencyMatrix = (nodes, n) => {
   const adj = math.matrix(math.zeros([n, n]));
 
@@ -82,7 +95,7 @@ const makeAdjacencyMatrix = (nodes, n) => {
 // Page Rank
 const rankPages = (cb) => {
   Post.findAndCountAll()
-    .then((result) => { cb(result.count); })
+    .then((result) => { cb(result.rows, result.count); })
     .catch(err => cb(err));
 };
 
