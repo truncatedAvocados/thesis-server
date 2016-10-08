@@ -42,7 +42,7 @@ const solver = (M, d, error) => {
   const ones = math.ones(N, N);
 
   // Vector of ranks for the ith node, scaled between [0, 1]
-  let v = math.zeros(N, 1).map((value, index) => { return Math.random(); });
+  let v = math.zeros(N, 1).map((value, index) => Math.random());
 
   // Normalize
   v = math.multiply(v, 1 / norm(v, 1));
@@ -61,4 +61,6 @@ const solver = (M, d, error) => {
 
   return v;
 };
+
+exports.module = { norm, normColumns, makeAdjacencyMatrix, solver };
 
