@@ -96,7 +96,9 @@ const makeAdjacencyMatrix = (nodes, n) => {
 // Page Rank
 const rankPages = (cb) => {
   Post.findAndCountAll()
-    .then((result) => { cb(result.rows, result.count); })
+    .then((result) => { makeAdjacencyMatrix(result.rows, result.count); })
+    .then((adj) => { normColumns(adj); })
+    .then((adj) => { cb(adj); })
     .catch(err => cb(err));
 };
 
