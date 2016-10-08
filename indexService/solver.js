@@ -62,5 +62,5 @@ const solver = (M, d, error) => {
   return v;
 };
 
-exports.module = { norm, normColumns, makeAdjacencyMatrix, solver };
+module.exports = { norm, normColumns, makeAdjacencyMatrix, solver };
 
