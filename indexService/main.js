@@ -12,6 +12,7 @@ var Edges = db.Edges;
 var Authors = db.Authors;
 var Tags = db.Tags;
 var Promise = require('bluebird');
+const solver = require('./solver');
 
 //This ranking function is for getting the h-factor of an author, as defined here:
 //https://en.wikipedia.org/wiki/H-index
@@ -67,10 +68,11 @@ var sortAuthors = function(posts) {
 // Page Rank
 const rankPages = (cb) => {
   Post.findAndCountAll()
-    .then((result) => { makeAdjacencyMatrix(result.rows, result.count); })
-    .then((adj) => { normColumns(adj); })
-    .then((adj) => { cb(adj); })
-    .catch(err => cb(err));
+    .then(results => solver.makeAdjacencyMatrix(results.rows, results.count))
+    .then(adj => solver.normColumns(adj, 1))
+    .then(M => solver.solver(M, 0.8, 0.001))
+    .then(v => cb(null, v))
+    .catch(err => cb(err, null));
 };
 
 
@@ -158,7 +160,6 @@ exports.initRebalance = function(cb) {
   });
 };
 
-exports.rankPages = rankPages;
 //TESTING THE METHODS
 
 // this.initRebalance(() => {
