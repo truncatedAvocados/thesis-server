@@ -29,17 +29,23 @@ const normColumns = (matrix, p) => {
 };
 
 const makeAdjacencyMatrix = (nodes, n) => {
-  const adj = math.zeros(n, n, 'sparse');
+  // Graph
+  const G = math.zeros(n, n, 'sparse');
+  // Column sum
+  const sum = math.zeros(1, n, 'sparse');
 
   nodes.forEach((node) => {
     // Node contains in links
     node.inLinks.forEach((link) => {
       // Add edge
-      adj.set([link, node.postId], 1);
+      G.set([link, node.postId], 1);
+      sum.set([1, node.postId], sum.get([1, node.postId]) + 1);
     });
   });
 
-  return adj;
+  const D = math.diag(sum.map((value, index) => 1 / value), 'sparse');
+
+  return math.multiply(G, D);
 };
 
 const solver = (M, d, error) => {
