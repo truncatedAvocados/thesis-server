@@ -1,17 +1,23 @@
 const assert = require('assert');
 const math = require('mathjs');
 const solver = require('../../indexService/solver');
+const rank = require('../../indexService/main');
 
 describe('Test Power Method', () => {
   // Test network and solution
   // http://www.mathworks.com/moler/exm/chapters/pagerank.pdf
-  const M = math.matrix([
+  const G = math.matrix([
     [0, 0, 0, 1, 0, 1],
     [1, 0, 0, 0, 0, 0],
     [0, 1, 0, 0, 0, 0],
     [0, 1, 1, 0, 0, 0],
     [0, 0, 1, 0, 0, 0],
     [1, 0, 1, 0, 0, 0]]);
+
+  // 1 / sum(Column)
+  const D = math.diag([0.5, 0.5, 0.333, 1, 0, 1], 'sparse');
+
+  const M = math.multiply(G, D);
 
   const ans = math.matrix([
     [0.3210],
@@ -21,8 +27,7 @@ describe('Test Power Method', () => {
     [0.0643],
     [0.2007]]);
 
-  const adj = solver.normColumns(M, 1);
-  const sol = solver.solver(adj, 0.85, 0.01);
+  const sol = solver.solver(M, 0.85, 0.01);
 
   it('Convergence', () => {
     if (sol !== undefined) {
