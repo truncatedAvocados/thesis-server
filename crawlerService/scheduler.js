@@ -109,14 +109,12 @@ module.exports = {
 
   scheduleCrawlersInteractive: (urlList, options, callback, crawled, tracker) => {
     tracker = tracker || 0;
-    console.log(tracker, urlList.length);
     if (tracker === urlList.length) {
       console.log('Finished');
       callback(new Date().getTime());
       return;
     }
 
-    console.log(urlList[tracker]);
     var scheduleCrawlersInteractive = module.exports.scheduleCrawlersInteractive;
     var crawled = crawled || {};
 
@@ -124,11 +122,9 @@ module.exports = {
 
     crawlUrl(urlList[tracker], options, (links, index) => {
       var result = urlList.slice();
-      console.log(crawled, !crawled[urlList[tracker].url]);
       if (!crawled[urlList[tracker].url]) {
         crawled[urlList[tracker].url] = true;
         var result = result.concat(links);
-        console.log('Concatting links: ', result, result.length);
       }
 
       scheduleCrawlersInteractive(result, options, callback, crawled, tracker + 1);

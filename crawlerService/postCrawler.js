@@ -223,7 +223,6 @@ exports.crawlUrl = (options, opt, cb) => {
     options.interactive = opt.interactive;
   }
 
-  console.log(options);
   if (options.parent && options.interactive) {
 
     var properties = [
