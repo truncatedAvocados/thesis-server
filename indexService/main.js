@@ -69,7 +69,6 @@ var sortAuthors = function(posts) {
 const rankPages = (cb) => {
   Post.findAndCountAll()
     .then(results => solver.makeAdjacencyMatrix(results.rows, results.count))
-    .then(adj => solver.normColumns(adj, 1))
     .then(M => solver.solver(M, 0.8, 0.001))
     .then(v => cb(null, v))
     .catch(err => cb(err, null));
@@ -160,6 +159,7 @@ exports.initRebalance = function(cb) {
   });
 };
 
+module.exports = rankPages;
 //TESTING THE METHODS
 
 // this.initRebalance(() => {
