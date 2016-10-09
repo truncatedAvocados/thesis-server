@@ -50,13 +50,13 @@ const solver = (M, d, error) => {
   let v = math.zeros(N, 1).map((value, index) => Math.random());
 
   // Normalize
-  v = math.multiply(v, 1 / norm(v, 1));
+  v = math.dotDivide(v, norm(v, 1));
 
   // Initial solution
   let lastV = math.ones(N, 1);
 
   // Transition matrix
-  const Mhat = math.add(math.multiply(d, M), math.multiply((1 - d) / N, ones));
+  const Mhat = math.add(math.dotMultiply(d, M), math.dotMultiply((1 - d) / N, ones));
 
   // Power method with convergence in L-2
   while (norm(math.subtract(v, lastV), 2) > error) {
@@ -64,7 +64,7 @@ const solver = (M, d, error) => {
     v = math.multiply(Mhat, v);
   }
 
-  return v;
+  return math.dotDivide(v, norm(v, 1));
 };
 
 module.exports = { norm, normColumns, makeAdjacencyMatrix, solver };
