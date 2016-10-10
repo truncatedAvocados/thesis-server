@@ -56,7 +56,7 @@ module.exports.query = function(req, res, options) {
 
     // Look at what page we are requesting, if necessary
     if (finalRanking.length > 20) {
-      var start = req.query.page ? req.query.page * 20 - 1 : 0;
+      var start = req.query.page ? (req.query.page - 1) * 20 : 0;
       //If no page was given we default to giving back the first 20 results
       finalRanking = finalRanking.slice(start, start + 20);
     } else {
