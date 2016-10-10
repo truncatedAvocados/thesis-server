@@ -5,6 +5,7 @@ var Tags = db.Tags;
 var Promise = require('bluebird');
 var stable = require('stable');
 var query = require('../utils/tagQuery.js');
+var _ = require('lodash');
 
 module.exports = function(req, res, options) {
   //Send back the total number of results recieved so the client
@@ -76,10 +77,20 @@ module.exports = function(req, res, options) {
     }));
 
   }).then(function(results) {
+
+    //if we're doing an author query, filter out the posts that don't include the tags
+    if (options.tagRank === 'authRank') {
+      results.forEach(auth => {
+        auth.posts = auth.posts.filter(post => _.intersectionWith(req.query.tags, post.oldTags, _.isEqual).length > 0);
+        //sort by post quality here?
+      });
+    }
+
     var sending = {
       results: results,
       count: totalResultCount
     };
+
     res.json(sending);
   }).catch(function(err) {
     console.log(err);
