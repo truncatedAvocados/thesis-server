@@ -32,18 +32,21 @@ const makeAdjacencyMatrix = (nodes, n) => {
   // Graph
   const G = math.zeros(n, n, 'sparse');
   // Column sum
-  const sum = math.zeros(1, n, 'sparse');
+  let D = math.zeros(n, n, 'sparse');
+  let index;
 
   nodes.forEach((node) => {
     // Node contains in links
     node.inLinks.forEach((link) => {
+      index = [node.postId - 1, node.postId - 1];
       // Add edge
-      G.set([link, node.postId], 1);
-      sum.set([1, node.postId], sum.get([1, node.postId]) + 1);
+      G.set([link - 1, node.postId - 1], 1);
+      D.set(index, D.get(index) + 1);
     });
   });
 
-  const D = math.diag(sum.map((value, index) => 1 / value), 'sparse');
+  // 1 / sum(Column)
+  D = D.map(value => 1 / value, true);
 
   return math.multiply(G, D);
 };
