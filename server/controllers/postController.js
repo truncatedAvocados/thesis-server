@@ -5,6 +5,7 @@ var Tags = db.Tags;
 var Promise = require('bluebird');
 var stable = require('stable');
 var query = require('../utils/tagQuery.js').query;
+var sortBy = require('../utils/tagQuery.js').sortBy;
 
 
 //Finds one all posts matching a tag, sorting them by inLinks
