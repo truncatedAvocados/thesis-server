@@ -34,6 +34,7 @@ const makeAdjacencyMatrix = (nodes, n) => {
   // Column sum
   let D = math.zeros(n, n, 'sparse');
   let index;
+  let value;
 
   nodes.forEach((node) => {
     // Node contains in links
@@ -46,7 +47,14 @@ const makeAdjacencyMatrix = (nodes, n) => {
   });
 
   // 1 / sum(Column)
-  D = D.map(value => 1 / value, true);
+  for (let i = 0; i < n; i += 1) {
+    index = [i, i];
+    value = D.get(index);
+
+    if (value > 0) {
+      D.set(index, 1 / value);
+    }
+  }
 
   return math.multiply(G, D);
 };
