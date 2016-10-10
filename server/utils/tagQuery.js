@@ -78,19 +78,23 @@ module.exports = function(req, res, options) {
 
   }).then(function(results) {
 
+    var sendResults = JSON.parse(JSON.stringify(results));
     //if we're doing an author query, filter out the posts that don't include the tags
     if (options.tagRank === 'authRank') {
-      results.forEach(auth => {
+      sendResults.forEach(auth => {
         auth.posts = auth.posts.filter(post => _.intersectionWith(req.query.tags, post.oldTags, _.isEqual).length > 0);
-        //sort by post quality here?
+        //sort by post quality here as well
+        auth.posts.sort((a, b) => b.inLinks.length - a.inLinks.length);
+
       });
     }
 
     var sending = {
-      results: results,
+      results: sendResults,
       count: totalResultCount
     };
 
+    // console.log(sending.results[0].posts[0].oldTags);
     res.json(sending);
   }).catch(function(err) {
     console.log(err);
