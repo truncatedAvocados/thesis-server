@@ -6,8 +6,10 @@ var Promise = require('bluebird');
 var stable = require('stable');
 var query = require('../utils/tagQuery.js');
 var _ = require('lodash');
+  
+module.exports.sortBy = (a, b) => b.inLinks.length - a.inLinks.length;
 
-module.exports = function(req, res, options) {
+module.exports.query = function(req, res, options) {
   //Send back the total number of results recieved so the client
   //can dynamically render
   var totalResultCount;
@@ -84,7 +86,7 @@ module.exports = function(req, res, options) {
       sendResults.forEach(auth => {
         auth.posts = auth.posts.filter(post => _.intersectionWith(req.query.tags, post.oldTags, _.isEqual).length > 0);
         //sort by post quality here as well
-        auth.posts.sort((a, b) => b.inLinks.length - a.inLinks.length);
+        auth.posts.sort(this.sortBy);
 
       });
     }
