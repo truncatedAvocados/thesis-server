@@ -7,6 +7,10 @@ var stable = require('stable');
 var query = require('../utils/tagQuery.js');
 
 module.exports = function(req, res, options) {
+  //Send back the total number of results recieved so the client
+  //can dynamically render
+  var totalResultCount;
+
   Tags.findAll({
     where: {
       name: {
@@ -44,6 +48,9 @@ module.exports = function(req, res, options) {
       finalRanking = stable(finalRanking, (a, b) => b.count.length > a.count.length);
     }
 
+    //Save total results
+    totalResultCount = finalRanking.length;
+
     // Look at what page we are requesting, if necessary
     if (finalRanking.length > 20) {
       var start = req.query.page ? req.query.page * 20 - 1 : 0;
@@ -69,7 +76,11 @@ module.exports = function(req, res, options) {
     }));
 
   }).then(function(results) {
-    res.json(results);
+    var sending = {
+      results: results,
+      count: totalResultCount
+    };
+    res.json(sending);
   }).catch(function(err) {
     console.log(err);
     res.status(500).send(err);
