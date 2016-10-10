@@ -5,8 +5,15 @@ var Tags = db.Tags;
 var Promise = require('bluebird');
 var stable = require('stable');
 var query = require('../utils/tagQuery.js');
+var _ = require('lodash');
+  
+module.exports.sortBy = (a, b) => b.inLinks.length - a.inLinks.length;
 
-module.exports = function(req, res, options) {
+module.exports.query = function(req, res, options) {
+  //Send back the total number of results recieved so the client
+  //can dynamically render
+  var totalResultCount;
+
   Tags.findAll({
     where: {
       name: {
@@ -44,9 +51,12 @@ module.exports = function(req, res, options) {
       finalRanking = stable(finalRanking, (a, b) => b.count.length > a.count.length);
     }
 
+    //Save total results
+    totalResultCount = finalRanking.length;
+
     // Look at what page we are requesting, if necessary
     if (finalRanking.length > 20) {
-      var start = req.query.page ? req.query.page * 20 - 1 : 0;
+      var start = req.query.page ? (req.query.page - 1) * 20 : 0;
       //If no page was given we default to giving back the first 20 results
       finalRanking = finalRanking.slice(start, start + 20);
     } else {
@@ -69,7 +79,25 @@ module.exports = function(req, res, options) {
     }));
 
   }).then(function(results) {
-    res.json(results);
+
+    var sendResults = JSON.parse(JSON.stringify(results));
+    //if we're doing an author query, filter out the posts that don't include the tags
+    if (options.tagRank === 'authRank') {
+      sendResults.forEach(auth => {
+        auth.posts = auth.posts.filter(post => _.intersectionWith(req.query.tags, post.oldTags, _.isEqual).length > 0);
+        //sort by post quality here as well
+        auth.posts.sort(this.sortBy);
+
+      });
+    }
+
+    var sending = {
+      results: sendResults,
+      count: totalResultCount
+    };
+
+    // console.log(sending.results[0].posts[0].oldTags);
+    res.json(sending);
   }).catch(function(err) {
     console.log(err);
     res.status(500).send(err);

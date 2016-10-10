@@ -10,7 +10,6 @@ var sequelize = process.env.RDS_DB_NAME
                   })
                   : new Sequelize('postgres://localhost:5432/testgraph', {logging: false});
 
-
 //Our primary table of interest. Importantly, inLinks are defined as the number of
 //links pointing towards the entry that inLinks is contained in
 //This is the reverse of the way you would normally think about a directed graph but

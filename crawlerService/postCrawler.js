@@ -8,12 +8,19 @@ const retext = require('retext');
 const nlcstToString = require('nlcst-to-string');
 const keywords = require('retext-keywords');
 
+// ~~~~~~~ Interactive stuff
+const prompt = require('prompt');
+const colors = require('colors/safe');
+prompt.message = colors.underline.green('BlogRank');
+prompt.delimiter = colors.green(' <-=-=-=-=-=-> ');
+
 class PostCrawler {
 
   constructor(options) {
     this.url = options.url;
     this.parent = options.parent;
     this.$ = null;
+    this.interactive = options.interactive;
 
     this.postInfo = {
       author: null,
@@ -63,7 +70,7 @@ class PostCrawler {
   }
 
   getBaseUrl(url) {
-    const regex = new RegExp("^(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(\\?(?:[^#]*))?(#(‌​?:.*))?");
+    const regex = new RegExp('^(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(\\?(?:[^#]*))?(#(‌​?:.*))?');
     return regex.exec(url)[4] ? null : regex.exec(url)[2];
   }
 
@@ -78,14 +85,29 @@ class PostCrawler {
 
     this.$('#content, #main, .post, .entry, .content').find('a').each((i, elem) => {
       href = this.$(elem).attr('href');
-      if (!redirectRegEx.test(href) &&
-          baseUrls[this.getBaseUrl(href)] &&
-          !urls[href] &&
-          this.getBaseUrl(href) !== this.getBaseUrl(this.url)) {
-        urls[href] = true;
-        this.postInfo.links.push({
-          parent: this.url,
-          url: href });
+      
+      //if we're in interactive mode we don't want to check against the
+      //baseUrls list anymore
+      if (this.interactive) {
+        if (!redirectRegEx.test(href) &&
+            !urls[href] &&
+            this.getBaseUrl(href) !== this.getBaseUrl(this.url)) {
+          urls[href] = true;
+          this.postInfo.links.push({
+            parent: this.url,
+            url: href });
+        }
+      } else {
+        //The normal way when we aren't in interactive mode
+        if (!redirectRegEx.test(href) &&
+            baseUrls[this.getBaseUrl(href)] &&
+            !urls[href] &&
+            this.getBaseUrl(href) !== this.getBaseUrl(this.url)) {
+          urls[href] = true;
+          this.postInfo.links.push({
+            parent: this.url,
+            url: href });
+        }
       }
     });
   }
@@ -195,23 +217,78 @@ class PostCrawler {
 
 exports.PostCrawler = PostCrawler;
 
-exports.crawlUrl = (options, cb) => {
+exports.crawlUrl = (options, opt, cb) => {
   console.log('CRAWLING: ', options.url);
-  const crawler = new PostCrawler(options);
-  crawler.get((errGet, postInfo) => {
-    if (errGet) {
-      console.log(errGet);
-      cb([]);
-    } else {
-      cb(postInfo.links);
-      postUtils.createOneWithEdge(postInfo, crawler.parent, (errEdge, found) => {
-        if (errEdge) {
-          console.log(errEdge);
-        } else {
-          console.log('STORED: ', found.dataValues.url);
-        }
-      });
-    }
-  });
+  if (opt) {
+    options.interactive = opt.interactive;
+  }
+
+  if (options.parent && options.interactive) {
+
+    var properties = [
+      {
+        message: 'Url: ' + options.url,
+        name: 'decision', 
+        validator: /^[y|n]+$/,
+        warning: colors.red('Just say yes or no man (y,n)')
+      }
+    ];
+
+    prompt.start();
+
+    prompt.get(properties, function (err, result) {
+      if (err) { 
+        console.log(err);
+        return 1;
+      }
+      if (result.decision === 'y') {
+        //Add it to the whitelist and Q
+        const crawler = new PostCrawler(options);
+        crawler.get((errGet, postInfo) => {
+          if (errGet) {
+            console.log(errGet);
+            cb([]);
+          } else {
+
+            cb(postInfo.links);
+
+            postUtils.createOneWithEdge(postInfo, crawler.parent, (errEdge, found) => {
+              if (errEdge) {
+                console.log(errEdge);
+              } else {
+                console.log('STORED: ', found.dataValues.url);
+              }
+            });
+          }
+        });
+      } else {
+        console.log(colors.magenta('Not adding it'));
+        cb([]);
+        return 1;
+      }
+    });
+
+  //Not interactive yet
+  } else {  
+    const crawler = new PostCrawler(options);
+    crawler.get((errGet, postInfo) => {
+      if (errGet) {
+        console.log(errGet);
+        cb([]);
+      } else {
+
+        cb(postInfo.links);
+
+        postUtils.createOneWithEdge(postInfo, crawler.parent, (errEdge, found) => {
+          if (errEdge) {
+            console.log(errEdge);
+          } else {
+            console.log('STORED: ', found.dataValues.url);
+          }
+        });
+      }
+    });
+  }
+
 };
 

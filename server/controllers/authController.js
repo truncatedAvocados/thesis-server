@@ -5,7 +5,8 @@ var Authors = db.Authors;
 var Tags = db.Tags;
 var Promise = require('bluebird');
 var stable = require('stable');
-var query = require('../utils/tagQuery.js');
+var query = require('../utils/tagQuery.js').query;
+var sortBy = require('../utils/tagQuery.js').sortBy;
 
 
 //Finds one all posts matching a tag, sorting them by inLinks
@@ -36,7 +37,7 @@ exports.findOne = function(req, res) {
     //Get all of these infos
     console.log(result);
     var authorPosts = result.posts;
-    authorPosts.sort((a, b) => b.inLinks.length - a.inLinks.length);
+    authorPosts.sort(sortBy);
     res.send(authorPosts);
 
   }).catch(function(err) {
