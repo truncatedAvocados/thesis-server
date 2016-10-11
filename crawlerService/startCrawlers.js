@@ -1,8 +1,6 @@
 const frontPageCrawler = require('./frontPageCrawler');
 const crawlUrl = require('./postCrawler').crawlUrl;
 const scheduler = require('./scheduler');
-const whitelist = require('./whitelist.json');
-
 const wl = require('./workerUtils/wlUtils.js');
 
 const prompt = require('prompt');
@@ -11,7 +9,6 @@ prompt.message = colors.underline.green('BlogRank');
 prompt.delimiter = colors.green(' <-=-=-=-=-=-> ');
 
 
-const whiteListKeys = Object.keys(whitelist);
 const startTime = new Date();
 
 const start = () => {
@@ -39,14 +36,13 @@ const start = () => {
                     return obj;
                   });
 
-      console.log(base, whitelist);
-
+      var whiteListKeys = Object.keys(whitelist);
       //First load up whitelist from DB, and pass them down
       //Where are these things checked from the json files?
         //1. front page crawler checks whether theres a sitemap or not
         //2. post crawler checks against base urls, but not in interactive mode
           // --> I think the easiest solution is to give the baseurl list as a reference to each crawler instance
-          
+
       if (process.argv.indexOf('--continue') > -1) {
         const queue = require('./queue.json');
 
@@ -75,17 +71,19 @@ const start = () => {
             console.log(colors.rainbow('\nYoU jUsT eNtErEd InTeRaCtIvE mOdE!!@@#$!!!'));
             console.log('Getting some random front page posts');
 
-            randomKeys = [];
+            randomSites = [];
+
             for (var i = 0; i < 1; i++) {
               var randomSite = whiteListKeys[Math.floor(Math.random() * whiteListKeys.length)];
-              if (randomKeys.indexOf(randomSite) < 0) {
-                randomKeys.push(randomSite);
+              var randomSiteObj = whitelist[randomSite];
+              if (randomSites.indexOf(randomSiteObj) < 0) {
+                randomSites.push(randomSiteObj);
               }
             }
 
             console.log(randomKeys);
 
-            frontPageCrawler.getPosts(randomKeys, (results) => {
+            frontPageCrawler.getPosts(randomSites, (results) => {
 
               console.log('POSTS FROM FRONT PAGE:' + results.length);
               results = results.map(result => {
@@ -95,19 +93,19 @@ const start = () => {
                 };
               });
               scheduler.scheduleCrawlersInteractive(results, {interactive: true}, (time) => {
-                console.log('You just did this for ' + (new Date() - startTime / (60 * 1000)) + ' minutes');
+                console.log('You just did this for ' + ((new Date() - startTime) / (60 * 1000)) + ' minutes');
               });
 
             });
 
           } else {
-            console.log(colors.magenta('Nevermind >:('));
+            console.log(colors.red('Nevermind >:('));
             return 1;
           }
         });
 
       } else {
-        frontPageCrawler.getPosts(whiteListKeys, (results) => {
+        frontPageCrawler.getPosts(whitelist, (results) => {
           console.log('FRONT PAGE POSTS: ', results.length);
           frontPageCrawler.filterPosts(results, (filtered) => {
             console.log('FILTERED POSTS: ', filtered.length);
