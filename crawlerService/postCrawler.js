@@ -14,6 +14,12 @@ const colors = require('colors/safe');
 prompt.message = colors.underline.green('BlogRank');
 prompt.delimiter = colors.green(' <-=-=-=-=-=-> ');
 
+const badTitles = [
+  '',
+  ' ',
+  '2011-01'
+];
+
 class PostCrawler {
 
   constructor(options) {
@@ -221,7 +227,7 @@ class PostCrawler {
 
 exports.PostCrawler = PostCrawler;
 
-const addEdge = function() {
+const addEdge = function(cb, options) {
   const crawler = new PostCrawler(options);
   crawler.get((errGet, postInfo) => {
     if (errGet) {
@@ -231,13 +237,15 @@ const addEdge = function() {
 
       cb(postInfo.links);
 
-      postUtils.createOneWithEdge(postInfo, crawler.parent, (errEdge, found) => {
-        if (errEdge) {
-          console.log(errEdge);
-        } else {
-          console.log('STORED: ', found.dataValues.url);
-        }
-      });
+      if (postInfo.desc !== '...' && badTitles.indexOf(postInfo.title) < 0) {
+        postUtils.createOneWithEdge(postInfo, crawler.parent, (errEdge, found) => {
+          if (errEdge) {
+            console.log(errEdge);
+          } else {
+            console.log('STORED: ', found.dataValues.url);
+          }
+        });
+      }
     }
   });
 };
@@ -268,24 +276,7 @@ exports.crawlUrl = (options, opt, cb) => {
       }
       if (result.decision === 'y') {
         //Add it to the whitelist and Q
-        const crawler = new PostCrawler(options);
-        crawler.get((errGet, postInfo) => {
-          if (errGet) {
-            console.log(errGet);
-            cb([]);
-          } else {
-
-            cb(postInfo.links);
-
-            postUtils.createOneWithEdge(postInfo, crawler.parent, (errEdge, found) => {
-              if (errEdge) {
-                console.log(errEdge);
-              } else {
-                console.log('STORED: ', found.dataValues.url);
-              }
-            });
-          }
-        });
+        addEdge(cb, options);
       } else {
         console.log(colors.magenta('Not adding it'));
         cb([]);
@@ -295,25 +286,7 @@ exports.crawlUrl = (options, opt, cb) => {
 
   //Not interactive yet
   } else {  
-    const crawler = new PostCrawler(options);
-    crawler.get((errGet, postInfo) => {
-      if (errGet) {
-        console.log(errGet);
-        cb([]);
-      } else {
-
-        cb(postInfo.links);
-
-        postUtils.createOneWithEdge(postInfo, crawler.parent, (errEdge, found) => {
-          if (errEdge) {
-            console.log(errEdge);
-          } else {
-            console.log('STORED: ', found.dataValues.url);
-          }
-        });
-      }
-    });
+    addEdge(cb, options);
   }
-
 };
 
