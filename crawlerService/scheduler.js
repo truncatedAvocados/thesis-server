@@ -117,14 +117,6 @@ module.exports = {
       return;
     }
 
-    ON_DEATH((signal, err) => {
-      fs.writeFile('queue.json', JSON.stringify(urlList.slice(urlCount)), (err) => {
-        if (err) {
-          console.log(err);
-        }
-      });
-    });
-
     var scheduleCrawlersInteractive = module.exports.scheduleCrawlersInteractive;
     var crawled = crawled || {};
 
@@ -132,7 +124,8 @@ module.exports = {
 
     crawlUrl(urlList[tracker], options, (links, index) => {
       
-      console.log('Is the baseUrl list in memory growing? ', Object.keys(options.baseUrls).length);
+      console.log('Your current baseUrl and whitelist size: ', Object.keys(options.baseUrls).length);
+      
       var result = urlList.slice();
 
       if (!crawled[urlList[tracker].url]) {

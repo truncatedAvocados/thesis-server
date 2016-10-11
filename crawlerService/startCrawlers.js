@@ -45,8 +45,12 @@ const start = () => {
 
       if (process.argv.indexOf('--continue') > -1) {
         const queue = require('./queue.json');
+        
+        var options = {
+          baseUrls: base
+        };
 
-        scheduler.scheduleCrawlersMulti(queue, (time) => {
+        scheduler.scheduleCrawlersMulti(queue, options, (time) => {
           console.log(time - startTime);
         });
       } else if (process.argv.indexOf('--add') > -1) {
@@ -68,20 +72,18 @@ const start = () => {
             return 1;
           }
           if (result.decision === 'y') {
-            console.log(colors.rainbow('\nYoU jUsT eNtErEd InTeRaCtIvE mOdE!!@@#$!!!'));
+            console.log(colors.rainbow('\nYOU JUST ENTERED INTERACTIVE MODE~~~~~'));
             console.log('Getting some random front page posts');
 
             randomSites = [];
 
-            for (var i = 0; i < 1; i++) {
+            for (var i = 0; i < 2; i++) {
               var randomSite = whiteListKeys[Math.floor(Math.random() * whiteListKeys.length)];
               var randomSiteObj = whitelist[randomSite];
               if (randomSites.indexOf(randomSiteObj) < 0) {
                 randomSites.push(randomSiteObj);
               }
             }
-
-            console.log(randomKeys);
 
             frontPageCrawler.getPosts(randomSites, (results) => {
 

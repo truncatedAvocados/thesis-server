@@ -20,7 +20,7 @@ const baseUrlGetter = (url) => {
   return regex.exec(url)[4] ? null : regex.exec(url)[2];
 };
 
-const sitMapGetter = (url) => {
+const siteMapGetter = (url) => {
   return undefined;
 };
 
@@ -276,14 +276,15 @@ exports.crawlUrl = (options, opt, cb) => {
     options.baseUrls = opt.baseUrls;
   }
 
+
   if (options.parent && options.interactive) {
 
     var properties = [
       {
-        message: 'Url: ' + options.url,
+        message: 'Add this url? ' + options.url,
         name: 'decision', 
-        validator: /^[y|n]+$/,
-        warning: colors.red('Just say yes or no man (y,n)')
+        validator: /^[y|n|e]+$/,
+        warning: colors.red('Just say yes or no or exit man (y,n,e)')
       }
     ];
 
@@ -304,7 +305,7 @@ exports.crawlUrl = (options, opt, cb) => {
         };
 
         var siteMap = siteMapGetter(options.url);
-        
+
         var wlObj = {
           url: options.url
         };
@@ -314,18 +315,24 @@ exports.crawlUrl = (options, opt, cb) => {
         }
 
 
-        wl.addOne(baseObj, (err, saved) => console.log('ADDED TO BASEURLS: ', saved));
-        wl.addOne(wlObj, (err, saved) => console.log('ADDED TO WHITELIST: ', saved));
+        wl.addOne(baseObj, (err, saved) => console.log('ADDED TO BASE_URLS: ', saved.dataValues.url));
+        wl.addOne(wlObj, (err, saved) => console.log('ADDED TO WHITELIST: ', saved.dataValues.url));
 
         //Add to the in-memory objext of baseUrls now too 
         //so the interactive crawler will keep working
         opt.baseUrls[base] = true;
         //Finally, add the post to the DB
         addEdge(cb, options);
-      } else {
+      } else if (result.decision === 'n') {
         console.log(colors.magenta('Not adding it'));
         cb([]);
         return 1;
+      } else {
+        console.log(colors.rainbow('EXITING INTERACTIVE MODE'));
+        
+        //add to in-memory object so the interaction stops
+        opt.interactive = false;
+        cb([]);
       }
     });
 
