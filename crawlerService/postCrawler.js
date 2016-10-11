@@ -29,6 +29,7 @@ class PostCrawler {
     this.$ = null;
     this.interactive = options.interactive;
     this.baseUrls = options.baseUrls;
+    this.baseUrl = null;
 
     this.postInfo = {
       author: null,
@@ -52,6 +53,7 @@ class PostCrawler {
         this.setAuthor();
         this.setDate();
         this.setDesc();
+        this.setBaseUrl();
 
         cb(null, this.postInfo);
       }
@@ -75,6 +77,10 @@ class PostCrawler {
 
   getLinks() {
     return this.postInfo.links;
+  }
+
+  setBaseUrl() {
+    this.baseUrl = this.getBaseUrl(this.url);
   }
 
   getBaseUrl(url) {
@@ -179,7 +185,7 @@ class PostCrawler {
     if (authorRel.length > 0) {
       author = authorRel;
     // Check for author tag
-    } else if (authorTag.length > 0 ) {
+    } else if (authorTag.length > 0 && authorTag.length < 50) {
       author = authorTag;
     }
 
