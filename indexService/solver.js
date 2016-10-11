@@ -32,7 +32,7 @@ const makeAdjacencyMatrix = (nodes, n) => {
   // Graph
   const G = math.zeros(n, n, 'sparse');
   // Column sum
-  let D = math.zeros(n, n, 'sparse');
+  const D = math.zeros(n, n, 'sparse');
   let index;
   let value;
 
@@ -61,24 +61,32 @@ const makeAdjacencyMatrix = (nodes, n) => {
 
 const solver = (M, d, error) => {
   const N = M.size()[1];
-  const ones = math.ones(N, N, 'sparse');
+  const ones = math.ones(1, N, 'sparse');
 
   // Vector of ranks for the ith node, scaled between [0, 1]
-  let v = math.zeros(N, 1).map((value, index) => Math.random());
+  let v = math.ones(N, 1);
 
   // Normalize
-  v = math.dotDivide(v, norm(v, 1));
+  v = math.dotDivide(v, N);
 
   // Initial solution
-  let lastV = math.ones(N, 1);
+  let lastV = math.zeros(N, 1);
 
   // Transition matrix
-  const Mhat = math.add(math.dotMultiply(d, M), math.dotMultiply((1 - d) / N, ones));
+  // Mhat = d*M + ((1 - d) / N) * ones
+  // d: damping
+  // M: Stochastic Transition matrix
+  // N: Number of posts
+  // ones: (N, N) matrix of ones
 
   // Power method with convergence in L-2
   while (norm(math.subtract(v, lastV), 2) > error) {
     lastV = v;
-    v = math.multiply(Mhat, v);
+
+    // Refactor transition matrix to save space
+    v = math.add(math.multiply(d, math.multiply(M, v)),
+          math.multiply(math.transpose(ones),
+            math.multiply((1 - d) / N, math.multiply(ones, v))));
   }
 
   return math.dotDivide(v, norm(v, 1));
