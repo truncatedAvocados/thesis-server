@@ -79,8 +79,8 @@ const rankPages = (cb) => {
       Post.findAndCountAll()
         .then(results => solver.makeAdjacencyMatrix(results.rows, n))
         .then(M => solver.solver(M, 0.8, 0.001))
-        .then(v => cb(null, v))
         .catch(err => cb(err, null)))
+    .then(v => cb(null, v))
     .catch(err => cb(err, null));
 };
 
