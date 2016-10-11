@@ -92,7 +92,13 @@ const start = () => {
                   parent: null
                 };
               });
-              scheduler.scheduleCrawlersInteractive(results, {interactive: true}, (time) => {
+
+              var options = {
+                interactive: true,
+                baseUrls: base
+              };
+
+              scheduler.scheduleCrawlersInteractive(results, options, (time) => {
                 console.log('You just did this for ' + ((new Date() - startTime) / (60 * 1000)) + ' minutes');
               });
 
@@ -109,10 +115,15 @@ const start = () => {
           console.log('FRONT PAGE POSTS: ', results.length);
           frontPageCrawler.filterPosts(results, (filtered) => {
             console.log('FILTERED POSTS: ', filtered.length);
-            // scheduler.scheduleCrawlers(filtered, null, (time) => {
+
+            var options = {
+              baseUrls: base
+            };
+
+            // scheduler.scheduleCrawlers(filtered, options, (time) => {
             //   console.log(time - startTime);
             // });
-            scheduler.scheduleCrawlersMulti(filtered, (time) => {
+            scheduler.scheduleCrawlersMulti(filtered, options, (time) => {
               console.log(time - startTime);
             });
           });

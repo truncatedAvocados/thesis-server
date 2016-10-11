@@ -6,7 +6,7 @@ const path = require('path');
 const crawlUrl = require('./postCrawler').crawlUrl;
 
 module.exports = {
-  scheduleCrawlersMulti: (urlList, callback) => {
+  scheduleCrawlersMulti: (urlList, options, callback) => {
     if (cluster.isMaster) {
       cluster.setupMaster({
         exec: path.join(__dirname, 'childProc.js')
@@ -28,7 +28,8 @@ module.exports = {
             type: 'start',
             from: 'master',
             data: urlList[urlCount],
-            count: urlCount
+            count: urlCount,
+            options: options
           });
         } else if (message.type = 'finish') {
           crawled[urlList[message.count].url] = true;
@@ -42,7 +43,8 @@ module.exports = {
               type: 'start',
               from: 'master',
               data: urlList[urlCount],
-              count: urlCount
+              count: urlCount,
+              options: options
             });
           } else {
             cluster.workers[message.from].send({
@@ -122,7 +124,7 @@ module.exports = {
         }
       });
     });
-    
+
     var scheduleCrawlersInteractive = module.exports.scheduleCrawlersInteractive;
     var crawled = crawled || {};
 

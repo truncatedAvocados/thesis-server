@@ -17,7 +17,8 @@ prompt.delimiter = colors.green(' <-=-=-=-=-=-> ');
 const badTitles = [
   '',
   ' ',
-  '2011-01'
+  '2011-01',
+  'Page not found · GitHub Pages'
 ];
 
 class PostCrawler {
@@ -27,6 +28,7 @@ class PostCrawler {
     this.parent = options.parent;
     this.$ = null;
     this.interactive = options.interactive;
+    this.baseUrls = options.baseUrls;
 
     this.postInfo = {
       author: null,
@@ -106,8 +108,7 @@ class PostCrawler {
       } else {
         //The normal way when we aren't in interactive mode
         if (!redirectRegEx.test(href) &&
-            // THIS IS WHERE THE CHECK AGAINST THE BASE URLS IS
-            baseUrls[this.getBaseUrl(href)] &&
+            this.baseUrls[this.getBaseUrl(href)] &&
             !urls[href] &&
             this.getBaseUrl(href) !== this.getBaseUrl(this.url)) {
           urls[href] = true;
@@ -178,7 +179,7 @@ class PostCrawler {
     if (authorRel.length > 0) {
       author = authorRel;
     // Check for author tag
-    } else if (authorTag.length > 0) {
+    } else if (authorTag.length > 0 ) {
       author = authorTag;
     }
 
@@ -211,7 +212,7 @@ class PostCrawler {
 
   setDesc() {
     const p =
-      this.$('#content, #main, .post, .entry, .content')
+      this.$('body, #content, #main, .post, .entry, .content')
         .find('p')
         // .first()
         .map(function(i, el) {
@@ -238,6 +239,7 @@ const addEdge = function(cb, options) {
 
       cb(postInfo.links);
 
+      console.log(postInfo.desc, postInfo.title);
       if (postInfo.desc !== '...' && badTitles.indexOf(postInfo.title) < 0) {
         postUtils.createOneWithEdge(postInfo, crawler.parent, (errEdge, found) => {
           if (errEdge) {
@@ -255,6 +257,7 @@ exports.crawlUrl = (options, opt, cb) => {
   console.log('CRAWLING: ', options.url);
   if (opt) {
     options.interactive = opt.interactive;
+    options.baseUrls = opt.baseUrls;
   }
 
   if (options.parent && options.interactive) {
@@ -277,6 +280,8 @@ exports.crawlUrl = (options, opt, cb) => {
       }
       if (result.decision === 'y') {
         //Add it to the whitelist and Q HERE
+
+        //Add it to both the DB and also to the 
         addEdge(cb, options);
       } else {
         console.log(colors.magenta('Not adding it'));
