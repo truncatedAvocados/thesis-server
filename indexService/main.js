@@ -67,10 +67,13 @@ var sortAuthors = function(posts) {
 
 // Page Rank
 const rankPages = (cb) => {
-  Post.findAndCountAll()
-    .then(results => solver.makeAdjacencyMatrix(results.rows, results.count))
-    .then(M => solver.solver(M, 0.8, 0.001))
-    .then(v => cb(null, v))
+  Post.max('postId')
+    .then(n =>
+      Post.findAndCountAll()
+        .then(results => solver.makeAdjacencyMatrix(results.rows, n))
+        .then(M => solver.solver(M, 0.8, 0.001))
+        .then(v => cb(null, v))
+        .catch(err => cb(err, null)))
     .catch(err => cb(err, null));
 };
 
