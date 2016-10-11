@@ -14,8 +14,16 @@ describe('Test Power Method', () => {
     [0, 0, 1, 0, 0, 0],
     [1, 0, 1, 0, 0, 0]], 'sparse');
 
+  const data = [
+    { postId: 1, inLinks: [2, 6] },
+    { postId: 2, inLinks: [3, 4] },
+    { postId: 3, inLinks: [4, 5, 6] },
+    { postId: 4, inLinks: [1] },
+    { postId: 5, inLinks: [] },
+    { postId: 6, inLinks: [1] }];
+
   // 1 / sum(Column)
-  const D = math.diag([0.5, 0.5, 0.333, 1, 0, 1], 'sparse');
+  const D = math.diag([1 / 2, 1 / 2, 1 / 3, 1, 0, 1], 'sparse');
 
   const M = math.multiply(G, D);
 
@@ -29,7 +37,13 @@ describe('Test Power Method', () => {
 
   const sol = solver.solver(M, 0.85, 0.01);
 
-  it('Convergence', () => {
+  const adj = solver.makeAdjacencyMatrix(data, data.length);
+
+  it('Make Adjacency Matrix', () => {
+    assert.deepEqual(adj.valueOf(), M.valueOf());
+  });
+
+  it('Solution Convergence', () => {
     if (sol !== undefined) {
       assert.ok(true);
     } else {
@@ -37,12 +51,28 @@ describe('Test Power Method', () => {
     }
   });
 
-  it('Accuracy', () => {
+  it('Solution Accuracy', () => {
     if (solver.norm(math.subtract(sol, ans), 2) < 0.1) {
       assert.ok(true);
     } else {
       assert.ok(false);
     }
+  });
+});
+
+describe('Rank Blog Posts', () => {
+  it('Rankings should sum to one', function cb(done) {
+    this.timeout(500000);
+
+    rank((err, ranks) => {
+      if (ranks === null) {
+        assert.ok(false);
+      } else {
+        assert.ok(Math.abs(math.sum(ranks.valueOf()) - 1) < 0.0001);
+      }
+
+      done();
+    });
   });
 });
 
