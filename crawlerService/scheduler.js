@@ -132,6 +132,7 @@ module.exports = {
 
     crawlUrl(urlList[tracker], options, (links, index) => {
       
+      console.log('Is the baseUrl list in memory growing? ', Object.keys(options.baseUrls).length);
       var result = urlList.slice();
 
       if (!crawled[urlList[tracker].url]) {

@@ -7,12 +7,22 @@ const postUtils = require('./workerUtils/postUtils');
 const retext = require('retext');
 const nlcstToString = require('nlcst-to-string');
 const keywords = require('retext-keywords');
+var wl = require('./workerUtils/wlUtils.js');
 
 // ~~~~~~~ Interactive stuff
 const prompt = require('prompt');
 const colors = require('colors/safe');
 prompt.message = colors.underline.green('BlogRank');
 prompt.delimiter = colors.green(' <-=-=-=-=-=-> ');
+
+const baseUrlGetter = (url) => {
+  const regex = new RegExp('^(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(\\?(?:[^#]*))?(#(‌​?:.*))?');
+  return regex.exec(url)[4] ? null : regex.exec(url)[2];
+};
+
+const sitMapGetter = (url) => {
+  return undefined;
+};
 
 const badTitles = [
   '',
@@ -285,9 +295,32 @@ exports.crawlUrl = (options, opt, cb) => {
         return 1;
       }
       if (result.decision === 'y') {
-        //Add it to the whitelist and Q HERE
 
-        //Add it to both the DB and also to the 
+        var base = baseUrlGetter(options.url);
+
+        var baseObj = {
+          url: base,
+          base: true
+        };
+
+        var siteMap = siteMapGetter(options.url);
+        
+        var wlObj = {
+          url: options.url
+        };
+
+        if (siteMap) {
+          wlObj.siteMap = siteMap;
+        }
+
+
+        wl.addOne(baseObj, (err, saved) => console.log('ADDED TO BASEURLS: ', saved));
+        wl.addOne(wlObj, (err, saved) => console.log('ADDED TO WHITELIST: ', saved));
+
+        //Add to the in-memory objext of baseUrls now too 
+        //so the interactive crawler will keep working
+        opt.baseUrls[base] = true;
+        //Finally, add the post to the DB
         addEdge(cb, options);
       } else {
         console.log(colors.magenta('Not adding it'));
