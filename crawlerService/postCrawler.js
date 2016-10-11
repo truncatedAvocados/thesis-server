@@ -206,16 +206,41 @@ class PostCrawler {
     const p =
       this.$('#content, #main, .post, .entry, .content')
         .find('p')
-        .first()
-        .text()
+        // .first()
+        .map(function(i, el) {
+          return cheerio(this).text();
+        })
+        .get()
+        .join(' | ')
         // Remove newline characters and tabs
         .replace(/\r?\n|\r|\t/g, '')
         .trim();
-    this.postInfo.desc = p.slice(0, 97).concat('...');
+    this.postInfo.desc = p.slice(0, 200).concat('...');
   }
 }
 
 exports.PostCrawler = PostCrawler;
+
+const addEdge = function() {
+  const crawler = new PostCrawler(options);
+  crawler.get((errGet, postInfo) => {
+    if (errGet) {
+      console.log(errGet);
+      cb([]);
+    } else {
+
+      cb(postInfo.links);
+
+      postUtils.createOneWithEdge(postInfo, crawler.parent, (errEdge, found) => {
+        if (errEdge) {
+          console.log(errEdge);
+        } else {
+          console.log('STORED: ', found.dataValues.url);
+        }
+      });
+    }
+  });
+};
 
 exports.crawlUrl = (options, opt, cb) => {
   console.log('CRAWLING: ', options.url);
