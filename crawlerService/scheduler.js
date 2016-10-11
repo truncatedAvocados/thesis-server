@@ -115,6 +115,14 @@ module.exports = {
       return;
     }
 
+    ON_DEATH((signal, err) => {
+      fs.writeFile('queue.json', JSON.stringify(urlList.slice(urlCount)), (err) => {
+        if (err) {
+          console.log(err);
+        }
+      });
+    });
+    
     var scheduleCrawlersInteractive = module.exports.scheduleCrawlersInteractive;
     var crawled = crawled || {};
 

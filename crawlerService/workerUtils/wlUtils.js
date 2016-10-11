@@ -12,18 +12,17 @@ exports.findAll = function(cb) {
 
 };
 
-exports.addOne = function(urlString, cb) {
+exports.addOne = function(obj, cb) {
   
+  //Url should have properties url, base, and sitemap (if applicable)
   WL.findOne({
     where: {
-      url: urlString,
+      url: obj.url,
     }
   }).then(function(found) {
     // console.log('I found a post: ', found);
     if (!found) {
-      return WL.create({
-        url: urlString
-      });
+      return WL.create(obj);
     } else {
       cb(null, found);      
     }

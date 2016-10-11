@@ -100,7 +100,12 @@ exports.WL = sequelize.define('whitelist', {
   url: {
     type: Sequelize.STRING,
     unique: true
-  }
+  },
+  base: {
+    type: Sequelize.BOOLEAN,
+    default: false
+  },
+  siteMap: Sequelize.STRING
 });
 
 

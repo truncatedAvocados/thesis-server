@@ -106,6 +106,7 @@ class PostCrawler {
       } else {
         //The normal way when we aren't in interactive mode
         if (!redirectRegEx.test(href) &&
+            // THIS IS WHERE THE CHECK AGAINST THE BASE URLS IS
             baseUrls[this.getBaseUrl(href)] &&
             !urls[href] &&
             this.getBaseUrl(href) !== this.getBaseUrl(this.url)) {
@@ -275,7 +276,7 @@ exports.crawlUrl = (options, opt, cb) => {
         return 1;
       }
       if (result.decision === 'y') {
-        //Add it to the whitelist and Q
+        //Add it to the whitelist and Q HERE
         addEdge(cb, options);
       } else {
         console.log(colors.magenta('Not adding it'));
