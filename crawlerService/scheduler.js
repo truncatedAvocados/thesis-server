@@ -121,7 +121,9 @@ module.exports = {
 
 
     crawlUrl(urlList[tracker], options, (links, index) => {
+      
       var result = urlList.slice();
+
       if (!crawled[urlList[tracker].url]) {
         crawled[urlList[tracker].url] = true;
         var result = result.concat(links);

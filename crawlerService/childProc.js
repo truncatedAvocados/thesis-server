@@ -6,7 +6,7 @@ console.log('Firing up process ', process.pid);
 var masterMessageHandler = (message) => {
   if (message.type === 'start') {
     var count = message.count;
-    crawlUrl(message.data, (links) => {
+    crawlUrl(message.data, null, (links) => {
       process.send({
         type: 'finish',
         from: cluster.worker.id,

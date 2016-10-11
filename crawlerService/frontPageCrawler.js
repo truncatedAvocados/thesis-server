@@ -43,7 +43,7 @@ module.exports = {
     var count = 0;
 
     var addPosts = (url) => {
-      request(url, (err, res, html) => {
+      request({ url: url, timeout: 10000}, (err, res, html) => {
         if (err) {
           console.log(err);
         } else {
@@ -67,7 +67,7 @@ module.exports = {
       });
     };
     var addPostsSiteMap = (url) => {
-      request(url, (err, res, xml) => {
+      request({ url: url, timeout: 10000}, (err, res, xml) => {
         if (err) {
           console.log(err);
         } else {
