@@ -78,17 +78,15 @@ const start = () => {
 
             randomSites = [];
 
-            // for (var i = 0; i < 2; i++) {
-            //   var randomSite = whiteListKeys[Math.floor(Math.random() * whiteListKeys.length)];
-            //   var randomSiteObj = whitelist[randomSite];
-            //   if (randomSites.indexOf(randomSiteObj) < 0) {
-            //     randomSites.push(randomSiteObj);
-            //   }
-            // }
-            //this is for debugging the blogger.com behavior
-            var neo = whitelist.filter(entry => entry['http://neopythonic.blogspot.com/']);
+            for (var i = 0; i < 2; i++) {
+              var randomSite = whiteListKeys[Math.floor(Math.random() * whiteListKeys.length)];
+              var randomSiteObj = whitelist[randomSite];
+              if (randomSites.indexOf(randomSiteObj) < 0) {
+                randomSites.push(randomSiteObj);
+              }
+            }
 
-            frontPageCrawler.getPosts(neo, (results) => {
+            frontPageCrawler.getPosts(randomSites, (results) => {
 
               console.log('POSTS FROM FRONT PAGE:' + results.length);
               results = results.map(result => {

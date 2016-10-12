@@ -148,7 +148,6 @@ module.exports = {
           //Add these to the beginning of the Q
           if (links[0] && links[0].parent.match(/www.blogger.com\/profile/)) {
             result = links.concat(result);
-            console.log(result.slice(0, 3));
           } else {
             result = result.concat(links);
           }
