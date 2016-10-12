@@ -5,6 +5,11 @@ const fs = require('fs');
 const path = require('path');
 const crawlUrl = require('./postCrawler').crawlUrl;
 
+const baseUrlGetter = (url) => {
+  const regex = new RegExp('^(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(\\?(?:[^#]*))?(#(‌​?:.*))?');
+  return regex.exec(url)[4] ? null : regex.exec(url)[2];
+};
+
 module.exports = {
   scheduleCrawlersMulti: (urlList, options, callback) => {
     if (cluster.isMaster) {
@@ -125,12 +130,18 @@ module.exports = {
     crawlUrl(urlList[tracker], options, (links, index) => {
       
       console.log('Your current baseUrl and whitelist size: ', Object.keys(options.baseUrls).length);
-      
+
       var result = urlList.slice();
 
       if (!crawled[urlList[tracker].url]) {
         crawled[urlList[tracker].url] = true;
-        var result = result.concat(links);
+        console.log(links);
+        //Add these to the beginning of the Q
+        if (links[0] && links[0].parent.match(/www.blogger.com\/profile/)) {
+          result = links.concat(result);
+        } else {
+          result = result.concat(links);
+        }
       }
 
       scheduleCrawlersInteractive(result, options, callback, crawled, tracker + 1);

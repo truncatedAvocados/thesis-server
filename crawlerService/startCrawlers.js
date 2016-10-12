@@ -13,20 +13,27 @@ const startTime = new Date();
 
 const start = () => {
 
-  wl.findAll((err, bothLists) => {
+  wl.findAll((err, allLists) => {
 
     if (!err) {
 
-      //process list
-      var base = bothLists
-                  .filter(item => item.base)
-                  .map(item => {
-                    var obj = {};
-                    obj[item.url] = true;
-                    return obj;
-                  });
+      //process lists
+      var base = {};
+      allLists
+        .filter(item => item.base)
+        .forEach(item => {
+          base[item.url] = true;
+        });
 
-      var whitelist = bothLists
+      var badUrls = {};
+      allLists
+        .filter(item => item.bad)
+        .forEach(item => {
+          badUrls[item.url] = true;
+        });
+
+
+      var whitelist = allLists
                   .filter(item => !item.base)
                   .map(item => {
                     var obj = {};

@@ -15,8 +15,6 @@ for (var url in whitelist) {
     obj.siteMap = whitelist[url].siteMap;
   }
 
-  console.log(obj);
-
   db.addOne(obj, (err, created) => console.log(err, created.dataValues));
   
 }

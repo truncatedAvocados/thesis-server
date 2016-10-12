@@ -127,6 +127,7 @@ class PostCrawler {
             this.baseUrls[this.getBaseUrl(href)] &&
             !urls[href] &&
             this.getBaseUrl(href) !== this.getBaseUrl(this.url)) {
+          console.log('HERE-------------------');
           urls[href] = true;
           this.postInfo.links.push({
             parent: this.url,
