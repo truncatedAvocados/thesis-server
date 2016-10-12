@@ -64,11 +64,14 @@ describe('Rank Blog Posts', () => {
   it('Rankings should sum to one', function cb(done) {
     this.timeout(500000);
 
-    rank((err, ranks) => {
-      if (ranks === null) {
+    rank((err, rankedPosts) => {
+      if (rankedPosts === null) {
         assert.ok(false);
       } else {
-        assert.ok(Math.abs(math.sum(ranks.valueOf()) - 1) < 0.0001);
+        assert.ok(true);
+        let sum = 0;
+        rankedPosts.forEach((post) => { sum += post.rank; });
+        assert.ok(Math.abs(sum - 1) < 0.001);
       }
 
       done();
