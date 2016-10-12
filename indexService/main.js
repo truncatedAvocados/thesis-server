@@ -58,17 +58,10 @@ const sortAuthors = (posts) => {
     });
   });
 
-  // console.log('Pre-filter: ',
-  //   results.map(result => result.id),
-  //   results.map(result => result.count));
   // filter out authors who have less than 5 posts on the subject
   results = results.filter(result => result.count > 4);
-  // console.log('Post-filter: ', results.map(result => result.id));
   // sort the results by highest h-index first
   results.sort((a, b) => b.hIndex - a.hIndex);
-  // console.log('Post-sorting: ',
-  //   results.map(result => result.id),
-  //   results.map(result => result.hIndex));
   // return a mapped array of just their ids
   return results.map(result => result.id);
 };
@@ -149,31 +142,18 @@ const rankPosts = (cb) => {
 
 
 exports.initRebalance = (cb) => {
-  // FOR PETE:
   // re-computing PageRank should come first, then re-make the rankings using values from PageRank
 
   pageRank((err, updatedRanks) => {
     rankAuthors((err, updatedAuthors, time) => {
-      // console.log('Time to assign h-index to author: ',
-      //   time / 1000 + ' seconds');
       // now we have each author and their h-index
       rankPosts((err, updatedTags, time) => {
-        // console.log('Time to rank posts and authors and add lists to tags: ',
-        //   time / 1000 + ' seconds');
-        // console.log('\nUpdated Author: ',
-        //   updatedAuthors.length,
-        //   '\nUpdated Tag: ',
-        //   updatedTags.length);
-
         cb();
       });
     });
   });
 };
 
+// Export for testing
 module.exports = pageRank;
-// TESTING THE METHODS
 
-// this.initRebalance(() => {
-//   console.log('\nDONE');
-// });
