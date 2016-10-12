@@ -74,7 +74,7 @@ const sortAuthors = (posts) => {
 };
 
 // Page Rank
-const rankPages = (cb) => {
+const pageRank = (cb) => {
   let posts;
   Post.max('postId')
     .then(n =>
@@ -170,7 +170,7 @@ exports.initRebalance = (cb) => {
   });
 };
 
-module.exports = rankPages;
+module.exports = pageRank;
 // TESTING THE METHODS
 
 // this.initRebalance(() => {
