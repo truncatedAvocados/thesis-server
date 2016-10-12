@@ -152,20 +152,21 @@ exports.initRebalance = (cb) => {
   // FOR PETE:
   // re-computing PageRank should come first, then re-make the rankings using values from PageRank
 
-
-  rankAuthors((err, updatedAuthors, time) => {
-    // console.log('Time to assign h-index to author: ',
-    //   time / 1000 + ' seconds');
-    // now we have each author and their h-index
-    rankPosts((err, updatedTags, time) => {
-      // console.log('Time to rank posts and authors and add lists to tags: ',
+  pageRank((err, updatedRanks) => {
+    rankAuthors((err, updatedAuthors, time) => {
+      // console.log('Time to assign h-index to author: ',
       //   time / 1000 + ' seconds');
-      // console.log('\nUpdated Author: ',
-      //   updatedAuthors.length,
-      //   '\nUpdated Tag: ',
-      //   updatedTags.length);
+      // now we have each author and their h-index
+      rankPosts((err, updatedTags, time) => {
+        // console.log('Time to rank posts and authors and add lists to tags: ',
+        //   time / 1000 + ' seconds');
+        // console.log('\nUpdated Author: ',
+        //   updatedAuthors.length,
+        //   '\nUpdated Tag: ',
+        //   updatedTags.length);
 
-      cb();
+        cb();
+      });
     });
   });
 };
