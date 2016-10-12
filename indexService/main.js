@@ -106,8 +106,8 @@ const rank = (Model, attrs, cb, options) => {
     .then(results =>
       Promise.all(results.map(instance =>
         instance.getPosts(options).then((posts) => {
-          // FOR PETE - CHANGE THIS TO SORT ON b.rank - a.rank ONCE PAGERANK IS IMPLEMENTED
-          posts.sort((a, b) => b.inLinks.length - a.inLinks.length);
+          // Sort by PageRank
+          posts.sort((a, b) => b.rank - a.rank);
 
           const obj = {};
           attrs.forEach((key) => { obj[key] = attrs[key](posts); });
