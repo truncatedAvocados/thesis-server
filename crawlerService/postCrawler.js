@@ -235,6 +235,7 @@ class PostCrawler {
           return cheerio(this).text();
         })
         .get()
+        .filter(text => text.match(/[\S]/))
         .join(' | ')
         // Remove newline characters and tabs
         .replace(/\r?\n|\r|\t/g, '')
