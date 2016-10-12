@@ -35,7 +35,7 @@ describe('Test Power Method', () => {
     [0.0643],
     [0.2007]]);
 
-  const sol = solver.solver(M, 0.85, 0.01);
+  const sol = solver.solver(M, 0.80, 0.01);
 
   const adj = solver.makeAdjacencyMatrix(data, data.length);
 
@@ -52,7 +52,7 @@ describe('Test Power Method', () => {
   });
 
   it('Solution Accuracy', () => {
-    if (solver.norm(math.subtract(sol, ans), 2) < 0.1) {
+    if (solver.norm(math.subtract(sol, ans), 2) < 0.01) {
       assert.ok(true);
     } else {
       assert.ok(false);
@@ -60,7 +60,7 @@ describe('Test Power Method', () => {
   });
 });
 
-describe('Rank Blog Posts', () => {
+xdescribe('Rank Blog Posts', () => {
   it('Rankings should sum to one', function cb(done) {
     this.timeout(500000);
 
