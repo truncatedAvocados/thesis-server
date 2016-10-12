@@ -198,7 +198,7 @@ describe('Utilities', function() {
 
       var addOne = Promise.promisify(wlUtil.addOne);
 
-      Promise.all(frontPages.map(page => addOne(page))).then(function(saved) {
+      Promise.all(frontPages.map(page => addOne({url: page}))).then(function(saved) {
         //console.log('Resolved: ', stuff);
 
         expect(saved.map(page => page.url)).to.deep.equal(frontPages);
@@ -212,6 +212,7 @@ describe('Utilities', function() {
     it('should get all entries', function(done) {
 
       wlUtil.findAll(function(err, results) {
+        console.log(err);
         expect(results.length).to.equal(4);
         if (!err) {
           done();

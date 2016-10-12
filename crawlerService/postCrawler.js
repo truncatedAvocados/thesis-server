@@ -38,7 +38,7 @@ class PostCrawler {
     this.parent = options.parent;
     this.$ = null;
     this.interactive = options.interactive;
-    this.baseUrls = options.baseUrls;
+    this.baseUrls = options.baseUrls || {};
     this.baseUrl = null;
 
     this.postInfo = {
