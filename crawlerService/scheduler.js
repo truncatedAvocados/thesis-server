@@ -114,9 +114,9 @@ module.exports = {
     });
   },
 
-  scheduleCrawlersInteractive: (urlList, options, callback, crawled, tracker) => {
-    tracker = tracker || 0;
-    if (tracker === urlList.length) {
+  scheduleCrawlersInteractive: (urlList, options, callback, crawled) => {
+
+    if (urlList.length === 0) {
       console.log('Finished');
       callback(new Date().getTime());
       return;
@@ -125,27 +125,37 @@ module.exports = {
     var scheduleCrawlersInteractive = module.exports.scheduleCrawlersInteractive;
     var crawled = crawled || {};
 
+    var baseCheck = baseUrlGetter(urlList[0].url);
+    
+    //Don't crawl these links
+    if (options.badUrls[baseCheck]) {
+      scheduleCrawlersInteractive(urlList.slice(1), options, callback, crawled);
 
+    } else {
+      crawlUrl(urlList[0], options, (links, index) => {
+  
+        // You can enable this to view your cache growing        
+        console.log('Your current baseUrl and whitelist size: ', Object.keys(options.baseUrls).length);
+        // console.log('Your current badUrls size: ', Object.keys(options.badUrls).length);
 
-    crawlUrl(urlList[tracker], options, (links, index) => {
-      
-      console.log('Your current baseUrl and whitelist size: ', Object.keys(options.baseUrls).length);
+        console.log(links[0]);
+        var result = urlList.slice(1);
 
-      var result = urlList.slice();
+        links = links.filter(link => !options.badUrls[baseUrlGetter(link)]);
 
-      if (!crawled[urlList[tracker].url]) {
-        crawled[urlList[tracker].url] = true;
-        console.log(links);
-        //Add these to the beginning of the Q
-        if (links[0] && links[0].parent.match(/www.blogger.com\/profile/)) {
-          result = links.concat(result);
-        } else {
-          result = result.concat(links);
+        if (!crawled[urlList[0].url]) {
+          crawled[urlList[0].url] = true;
+          //Add these to the beginning of the Q
+          if (links[0] && links[0].parent.match(/www.blogger.com\/profile/)) {
+            result = links.concat(result);
+            console.log(result.slice(0, 3));
+          } else {
+            result = result.concat(links);
+          }
         }
-      }
-
-      scheduleCrawlersInteractive(result, options, callback, crawled, tracker + 1);
-    });
-  }  
+        scheduleCrawlersInteractive(result, options, callback, crawled);
+      });
+    }  
+  }
 };
 

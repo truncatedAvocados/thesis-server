@@ -105,6 +105,10 @@ exports.WL = sequelize.define('whitelist', {
     type: Sequelize.BOOLEAN,
     default: false
   },
+  bad: {
+    type: Sequelize.BOOLEAN,
+    default: false
+  },
   siteMap: Sequelize.STRING
 });
 

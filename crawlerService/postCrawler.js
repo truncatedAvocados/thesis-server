@@ -107,7 +107,8 @@ class PostCrawler {
     // Remove old links
     this.postInfo.links = [];
 
-    this.$('#content, #main, .post, .entry, .content').find('a').each((i, elem) => {
+    //maia-main is for blogger.com
+    this.$('#maia-main, #content, #main, .post, .entry, .content').find('a').each((i, elem) => {
       href = this.$(elem).attr('href');
       
       //if we're in interactive mode we don't want to check against the
@@ -124,10 +125,12 @@ class PostCrawler {
       } else {
         //The normal way when we aren't in interactive mode
         if (!redirectRegEx.test(href) &&
+            // This line is the difference between interactive / not
+            //It's saying don't add a link to the Q unless its baseUrl is in
+            //the accepted baseUrls
             this.baseUrls[this.getBaseUrl(href)] &&
             !urls[href] &&
             this.getBaseUrl(href) !== this.getBaseUrl(this.url)) {
-          console.log('HERE-------------------');
           urls[href] = true;
           this.postInfo.links.push({
             parent: this.url,
@@ -255,17 +258,19 @@ const addEdge = function(cb, options) {
       cb([]);
     } else {
 
-      cb(postInfo.links);
 
-      console.log(postInfo.desc, postInfo.title);
       if (postInfo.desc !== '...' && badTitles.indexOf(postInfo.title) < 0) {
         postUtils.createOneWithEdge(postInfo, crawler.parent, (errEdge, found) => {
           if (errEdge) {
+            cb(postInfo.links);
             console.log(errEdge);
           } else {
+            cb(postInfo.links);
             console.log('STORED: ', found.dataValues.url);
           }
         });
+      } else {
+        cb([]);
       }
     }
   });
@@ -278,15 +283,16 @@ exports.crawlUrl = (options, opt, cb) => {
     options.baseUrls = opt.baseUrls;
   }
 
-
-  if (options.parent && options.interactive) {
+  if (!options.url) {
+    cb([]);
+  } else if (options.parent && options.interactive) {
 
     var properties = [
       {
         message: 'Add this url? ' + options.url,
         name: 'decision', 
-        validator: /^[y|n|e]+$/,
-        warning: colors.red('Just say yes or no or exit man (y,n,e)')
+        validator: /^[y|n|e|a]+$/,
+        warning: colors.red('Choose yes, no, exit interactive mode, or add to badUrls (y,n,e,a)')
       }
     ];
 
@@ -316,19 +322,37 @@ exports.crawlUrl = (options, opt, cb) => {
           wlObj.siteMap = siteMap;
         }
 
-
-        wl.addOne(baseObj, (err, saved) => console.log('ADDED TO BASE_URLS: ', saved.dataValues.url));
-        wl.addOne(wlObj, (err, saved) => console.log('ADDED TO WHITELIST: ', saved.dataValues.url));
-
         //Add to the in-memory objext of baseUrls now too 
         //so the interactive crawler will keep working
         opt.baseUrls[base] = true;
-        //Finally, add the post to the DB
-        addEdge(cb, options);
+
+        wl.addOne(baseObj, (err, saved) => {
+          console.log('ADDED TO BASE_URLS: ', saved.dataValues.url);
+          wl.addOne(wlObj, (err, saved) => { 
+            console.log('ADDED TO WHITELIST: ', saved.dataValues.url);
+            //Finally, add the post to the DB
+            addEdge(cb, options);            
+          });
+        });
+
       } else if (result.decision === 'n') {
-        console.log(colors.magenta('Not adding it'));
+        console.log(colors.red('Not adding it'));
         cb([]);
         return 1;
+      } else if (result.decision === 'a') {
+
+        var bad = baseUrlGetter(options.url);
+        var badObj = {
+          url: bad,
+          bad: true
+        };
+
+        opt.badUrls[bad] = true;
+        wl.addOne(badObj, (err, saved) => {
+          console.log('ADDED TO BAD_URLS: ', saved.dataValues.url);
+          cb([]);
+        });
+
       } else {
         console.log(colors.rainbow('EXITING INTERACTIVE MODE'));
         

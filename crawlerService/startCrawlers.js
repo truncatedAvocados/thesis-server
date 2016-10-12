@@ -32,7 +32,6 @@ const start = () => {
           badUrls[item.url] = true;
         });
 
-
       var whitelist = allLists
                   .filter(item => !item.base)
                   .map(item => {
@@ -44,11 +43,6 @@ const start = () => {
                   });
 
       var whiteListKeys = Object.keys(whitelist);
-      //First load up whitelist from DB, and pass them down
-      //Where are these things checked from the json files?
-        //1. front page crawler checks whether theres a sitemap or not
-        //2. post crawler checks against base urls, but not in interactive mode
-          // --> I think the easiest solution is to give the baseurl list as a reference to each crawler instance
 
       if (process.argv.indexOf('--continue') > -1) {
         const queue = require('./queue.json');
@@ -84,15 +78,17 @@ const start = () => {
 
             randomSites = [];
 
-            for (var i = 0; i < 2; i++) {
-              var randomSite = whiteListKeys[Math.floor(Math.random() * whiteListKeys.length)];
-              var randomSiteObj = whitelist[randomSite];
-              if (randomSites.indexOf(randomSiteObj) < 0) {
-                randomSites.push(randomSiteObj);
-              }
-            }
+            // for (var i = 0; i < 2; i++) {
+            //   var randomSite = whiteListKeys[Math.floor(Math.random() * whiteListKeys.length)];
+            //   var randomSiteObj = whitelist[randomSite];
+            //   if (randomSites.indexOf(randomSiteObj) < 0) {
+            //     randomSites.push(randomSiteObj);
+            //   }
+            // }
+            //this is for debugging the blogger.com behavior
+            var neo = whitelist.filter(entry => entry['http://neopythonic.blogspot.com/']);
 
-            frontPageCrawler.getPosts(randomSites, (results) => {
+            frontPageCrawler.getPosts(neo, (results) => {
 
               console.log('POSTS FROM FRONT PAGE:' + results.length);
               results = results.map(result => {
@@ -104,7 +100,8 @@ const start = () => {
 
               var options = {
                 interactive: true,
-                baseUrls: base
+                baseUrls: base,
+                badUrls: badUrls
               };
 
               scheduler.scheduleCrawlersInteractive(results, options, (time) => {
