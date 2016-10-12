@@ -37,13 +37,15 @@ var isValid = (url) => {
 
 module.exports = {
   getPosts: (urlList, callback) => {
+
+    //Note to Amir: urlList is now identical to whitelist.json
     var result = [];      
     var added = {};
     var filters = ['header', 'footer', 'aside', 'nav', '.nav', '.navbar'];
     var count = 0;
 
     var addPosts = (url) => {
-      request(url, (err, res, html) => {
+      request({ url: url, timeout: 10000}, (err, res, html) => {
         if (err) {
           console.log(err);
         } else {
@@ -67,7 +69,7 @@ module.exports = {
       });
     };
     var addPostsSiteMap = (url) => {
-      request(url, (err, res, xml) => {
+      request({ url: url, timeout: 10000}, (err, res, xml) => {
         if (err) {
           console.log(err);
         } else {
@@ -91,11 +93,13 @@ module.exports = {
         }
       });
     };
-    urlList.forEach((url) => {
-      if (whiteList[url] && whiteList[url].siteMap) {
-        addPostsSiteMap(whiteList[url].siteMap);
+    urlList.forEach((urlObj) => {
+      //No need to check both if it's in the whitelist now,
+      //just if it has a sitemap
+      if (urlObj.siteMap) {
+        addPostsSiteMap(urlObj.siteMap);
       } else {
-        addPosts(url);
+        addPosts(Object.keys(urlObj)[0]);
       }
     });
   },

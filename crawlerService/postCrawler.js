@@ -7,12 +7,29 @@ const postUtils = require('./workerUtils/postUtils');
 const retext = require('retext');
 const nlcstToString = require('nlcst-to-string');
 const keywords = require('retext-keywords');
+var wl = require('./workerUtils/wlUtils.js');
 
 // ~~~~~~~ Interactive stuff
 const prompt = require('prompt');
 const colors = require('colors/safe');
 prompt.message = colors.underline.green('BlogRank');
 prompt.delimiter = colors.green(' <-=-=-=-=-=-> ');
+
+const baseUrlGetter = (url) => {
+  const regex = new RegExp('^(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(\\?(?:[^#]*))?(#(‌​?:.*))?');
+  return regex.exec(url)[4] ? null : regex.exec(url)[2];
+};
+
+const siteMapGetter = (url) => {
+  return undefined;
+};
+
+const badTitles = [
+  '',
+  ' ',
+  '2011-01',
+  'Page not found · GitHub Pages'
+];
 
 class PostCrawler {
 
@@ -21,6 +38,8 @@ class PostCrawler {
     this.parent = options.parent;
     this.$ = null;
     this.interactive = options.interactive;
+    this.baseUrls = options.baseUrls || {};
+    this.baseUrl = null;
 
     this.postInfo = {
       author: null,
@@ -44,6 +63,7 @@ class PostCrawler {
         this.setAuthor();
         this.setDate();
         this.setDesc();
+        this.setBaseUrl();
 
         cb(null, this.postInfo);
       }
@@ -69,6 +89,10 @@ class PostCrawler {
     return this.postInfo.links;
   }
 
+  setBaseUrl() {
+    this.baseUrl = this.getBaseUrl(this.url);
+  }
+
   getBaseUrl(url) {
     const regex = new RegExp('^(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(\\?(?:[^#]*))?(#(‌​?:.*))?');
     return regex.exec(url)[4] ? null : regex.exec(url)[2];
@@ -83,7 +107,8 @@ class PostCrawler {
     // Remove old links
     this.postInfo.links = [];
 
-    this.$('#content, #main, .post, .entry, .content').find('a').each((i, elem) => {
+    //maia-main is for blogger.com
+    this.$('#maia-main, #content, #main, .post, .entry, .content').find('a').each((i, elem) => {
       href = this.$(elem).attr('href');
       
       //if we're in interactive mode we don't want to check against the
@@ -100,7 +125,10 @@ class PostCrawler {
       } else {
         //The normal way when we aren't in interactive mode
         if (!redirectRegEx.test(href) &&
-            baseUrls[this.getBaseUrl(href)] &&
+            // This line is the difference between interactive / not
+            //It's saying don't add a link to the Q unless its baseUrl is in
+            //the accepted baseUrls
+            this.baseUrls[this.getBaseUrl(href)] &&
             !urls[href] &&
             this.getBaseUrl(href) !== this.getBaseUrl(this.url)) {
           urls[href] = true;
@@ -171,7 +199,7 @@ class PostCrawler {
     if (authorRel.length > 0) {
       author = authorRel;
     // Check for author tag
-    } else if (authorTag.length > 0) {
+    } else if (authorTag.length > 0 && authorTag.length < 50) {
       author = authorTag;
     }
 
@@ -204,33 +232,67 @@ class PostCrawler {
 
   setDesc() {
     const p =
-      this.$('#content, #main, .post, .entry, .content')
+      this.$('body, #content, #main, .post, .entry, .content')
         .find('p')
-        .first()
-        .text()
+        // .first()
+        .map(function(i, el) {
+          return cheerio(this).text();
+        })
+        .get()
+        .filter(text => text.match(/[\S]/))
+        .join(' | ')
         // Remove newline characters and tabs
         .replace(/\r?\n|\r|\t/g, '')
         .trim();
-    this.postInfo.desc = p.slice(0, 97).concat('...');
+    this.postInfo.desc = p.slice(0, 200).concat('...');
   }
 }
 
 exports.PostCrawler = PostCrawler;
 
+const addEdge = function(cb, options) {
+  const crawler = new PostCrawler(options);
+  crawler.get((errGet, postInfo) => {
+    if (errGet) {
+      console.log(errGet);
+      cb([]);
+    } else {
+
+
+      if (postInfo.desc !== '...' && badTitles.indexOf(postInfo.title) < 0) {
+        postUtils.createOneWithEdge(postInfo, crawler.parent, (errEdge, found) => {
+          if (errEdge) {
+            cb(postInfo.links);
+            console.log(errEdge);
+          } else {
+            cb(postInfo.links);
+            console.log('STORED: ', found.dataValues.url);
+          }
+        });
+      } else {
+        cb([]);
+      }
+    }
+  });
+};
+
 exports.crawlUrl = (options, opt, cb) => {
   console.log('CRAWLING: ', options.url);
   if (opt) {
     options.interactive = opt.interactive;
+    options.baseUrls = opt.baseUrls;
   }
 
-  if (options.parent && options.interactive) {
+  if (!options.url) {
+    cb([]);
+  } else if (options.parent && options.interactive) {
 
     var properties = [
       {
-        message: 'Url: ' + options.url,
+        message: 'Add this url? ' + options.url,
         name: 'decision', 
-        validator: /^[y|n]+$/,
-        warning: colors.red('Just say yes or no man (y,n)')
+        validator: /^[y|n|e|a]+$/,
+        warning: colors.red('Choose yes, no, exit interactive mode, or add to badUrls (y,n,e,a)')
       }
     ];
 
@@ -242,53 +304,67 @@ exports.crawlUrl = (options, opt, cb) => {
         return 1;
       }
       if (result.decision === 'y') {
-        //Add it to the whitelist and Q
-        const crawler = new PostCrawler(options);
-        crawler.get((errGet, postInfo) => {
-          if (errGet) {
-            console.log(errGet);
-            cb([]);
-          } else {
 
-            cb(postInfo.links);
+        var base = baseUrlGetter(options.url);
 
-            postUtils.createOneWithEdge(postInfo, crawler.parent, (errEdge, found) => {
-              if (errEdge) {
-                console.log(errEdge);
-              } else {
-                console.log('STORED: ', found.dataValues.url);
-              }
-            });
-          }
+        var baseObj = {
+          url: base,
+          base: true
+        };
+
+        var siteMap = siteMapGetter(options.url);
+
+        var wlObj = {
+          url: options.url
+        };
+
+        if (siteMap) {
+          wlObj.siteMap = siteMap;
+        }
+
+        //Add to the in-memory objext of baseUrls now too 
+        //so the interactive crawler will keep working
+        opt.baseUrls[base] = true;
+
+        wl.addOne(baseObj, (err, saved) => {
+          console.log('ADDED TO BASE_URLS: ', saved.dataValues.url);
+          wl.addOne(wlObj, (err, saved) => { 
+            console.log('ADDED TO WHITELIST: ', saved.dataValues.url);
+            //Finally, add the post to the DB
+            addEdge(cb, options);            
+          });
         });
-      } else {
-        console.log(colors.magenta('Not adding it'));
+
+      } else if (result.decision === 'n') {
+        console.log(colors.red('Not adding it'));
         cb([]);
         return 1;
+      } else if (result.decision === 'a') {
+
+        var bad = baseUrlGetter(options.url);
+        var badObj = {
+          url: bad,
+          bad: true
+        };
+
+        opt.badUrls[bad] = true;
+        wl.addOne(badObj, (err, saved) => {
+          console.log('ADDED TO BAD_URLS: ', saved.dataValues.url);
+          cb([]);
+        });
+
+      } else {
+        console.log(colors.rainbow('EXITING INTERACTIVE MODE'));
+        
+        //add to in-memory object so the interaction stops
+        opt.interactive = false;
+        cb([]);
       }
     });
 
   //Not interactive yet
   } else {  
-    const crawler = new PostCrawler(options);
-    crawler.get((errGet, postInfo) => {
-      if (errGet) {
-        console.log(errGet);
-        cb([]);
-      } else {
-
-        cb(postInfo.links);
-
-        postUtils.createOneWithEdge(postInfo, crawler.parent, (errEdge, found) => {
-          if (errEdge) {
-            console.log(errEdge);
-          } else {
-            console.log('STORED: ', found.dataValues.url);
-          }
-        });
-      }
-    });
+    addEdge(cb, options);
   }
-
 };
 

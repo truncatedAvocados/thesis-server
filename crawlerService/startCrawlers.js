@@ -1,91 +1,145 @@
 const frontPageCrawler = require('./frontPageCrawler');
 const crawlUrl = require('./postCrawler').crawlUrl;
 const scheduler = require('./scheduler');
-const whitelist = require('./whitelist.json');
+const wl = require('./workerUtils/wlUtils.js');
+
 const prompt = require('prompt');
 const colors = require('colors/safe');
 prompt.message = colors.underline.green('BlogRank');
 prompt.delimiter = colors.green(' <-=-=-=-=-=-> ');
 
 
-const whiteListKeys = Object.keys(whitelist);
 const startTime = new Date();
 
 const start = () => {
-  if (process.argv.indexOf('--continue') > -1) {
-    const queue = require('./queue.json');
 
-    scheduler.scheduleCrawlersMulti(queue, (time) => {
-      console.log(time - startTime);
-    });
-  } else if (process.argv.indexOf('--add') > -1) {
+  wl.findAll((err, allLists) => {
 
-    var properties = [
-      {
-        message: 'ENTER INTERACTIVE MODE? (Y/n)',
-        name: 'decision', 
-        validator: /^[y|n]+$/,
-        warning: colors.red('Just say yes or no man (y,n)')
-      }
-    ];
+    if (!err) {
 
-    prompt.start();
+      //process lists
+      var base = {};
+      allLists
+        .filter(item => item.base)
+        .forEach(item => {
+          base[item.url] = true;
+        });
 
-    prompt.get(properties, function (err, result) {
-      if (err) { 
-        console.log(err);
-        return 1;
-      }
-      if (result.decision === 'y') {
-        console.log(colors.rainbow('\nYoU jUsT eNtErEd InTeRaCtIvE mOdE!!@@#$!!!'));
-        console.log('Getting some random front page posts');
+      var badUrls = {};
+      allLists
+        .filter(item => item.bad)
+        .forEach(item => {
+          badUrls[item.url] = true;
+        });
 
-        randomKeys = [];
-        for (var i = 0; i < 1; i++) {
-          var randomSite = whiteListKeys[Math.floor(Math.random() * whiteListKeys.length)];
-          if (randomKeys.indexOf(randomSite) < 0) {
-            randomKeys.push(randomSite);
+      var whitelist = allLists
+                  .filter(item => !item.base)
+                  .map(item => {
+                    var obj = {};
+                    obj[item.url] = {
+                      siteMap: item.siteMap
+                    };
+                    return obj;
+                  });
+
+      var whiteListKeys = Object.keys(whitelist);
+
+      if (process.argv.indexOf('--continue') > -1) {
+        const queue = require('./queue.json');
+        
+        var options = {
+          baseUrls: base
+        };
+
+        scheduler.scheduleCrawlersMulti(queue, options, (time) => {
+          console.log(time - startTime);
+        });
+      } else if (process.argv.indexOf('--add') > -1) {
+
+        var properties = [
+          {
+            message: 'ENTER INTERACTIVE MODE? (Y/n)',
+            name: 'decision', 
+            validator: /^[y|n]+$/,
+            warning: colors.red('Just say yes or no man (y,n)')
           }
-        }
+        ];
 
-        console.log(randomKeys);
+        prompt.start();
 
-        frontPageCrawler.getPosts(randomKeys, (results) => {
+        prompt.get(properties, function (err, result) {
+          if (err) { 
+            console.log(err);
+            return 1;
+          }
+          if (result.decision === 'y') {
+            console.log(colors.rainbow('\nYOU JUST ENTERED INTERACTIVE MODE~~~~~'));
+            console.log('Getting some random front page posts');
 
-          console.log('POSTS FROM FRONT PAGE:' + results.length);
-          results = results.map(result => {
-            return {
-              url: result,
-              parent: null
-            };
-          });
-          scheduler.scheduleCrawlersInteractive(results, {interactive: true}, (time) => {
-            console.log('You just did this for ' + (new Date() - startTime / (60 * 1000)) + ' minutes');
-          });
+            randomSites = [];
 
+            for (var i = 0; i < 2; i++) {
+              var randomSite = whiteListKeys[Math.floor(Math.random() * whiteListKeys.length)];
+              var randomSiteObj = whitelist[randomSite];
+              if (randomSites.indexOf(randomSiteObj) < 0) {
+                randomSites.push(randomSiteObj);
+              }
+            }
+
+            frontPageCrawler.getPosts(randomSites, (results) => {
+
+              console.log('POSTS FROM FRONT PAGE:' + results.length);
+              results = results.map(result => {
+                return {
+                  url: result,
+                  parent: null
+                };
+              });
+
+              var options = {
+                interactive: true,
+                baseUrls: base,
+                badUrls: badUrls
+              };
+
+              scheduler.scheduleCrawlersInteractive(results, options, (time) => {
+                console.log('You just did this for ' + ((new Date() - startTime) / (60 * 1000)) + ' minutes');
+              });
+
+            });
+
+          } else {
+            console.log(colors.red('Nevermind >:('));
+            return 1;
+          }
         });
 
       } else {
-        console.log(colors.magenta('Nevermind >:('));
-        return 1;
-      }
-    });
+        frontPageCrawler.getPosts(whitelist, (results) => {
+          console.log('FRONT PAGE POSTS: ', results.length);
+          frontPageCrawler.filterPosts(results, (filtered) => {
+            console.log('FILTERED POSTS: ', filtered.length);
 
-  } else {
-    frontPageCrawler.getPosts(whiteListKeys, (results) => {
-      console.log('FRONT PAGE POSTS: ', results.length);
-      frontPageCrawler.filterPosts(results, (filtered) => {
-        console.log('FILTERED POSTS: ', filtered.length);
-        // scheduler.scheduleCrawlers(filtered, null, (time) => {
-        //   console.log(time - startTime);
-        // });
-        scheduler.scheduleCrawlersMulti(filtered, (time) => {
-          console.log(time - startTime);
+            var options = {
+              baseUrls: base
+            };
+
+            // scheduler.scheduleCrawlers(filtered, options, (time) => {
+            //   console.log(time - startTime);
+            // });
+            scheduler.scheduleCrawlersMulti(filtered, options, (time) => {
+              console.log(time - startTime);
+            });
+          });
         });
-      });
-    });
-  }
+      }
+    } else {
+      console.log(err);
+    }
+
+  });
 };
+
 start();
 module.exports = start;
 
