@@ -13,6 +13,7 @@
 const db = require('../db/database');
 const Promise = require('bluebird');
 const solver = require('./solver');
+const math = require('mathjs');
 
 const Post = db.Post;
 const Edges = db.Edges;
@@ -74,13 +75,24 @@ const sortAuthors = (posts) => {
 
 // Page Rank
 const rankPages = (cb) => {
+  let posts;
   Post.max('postId')
     .then(n =>
-      Post.findAndCountAll()
-        .then(results => solver.makeAdjacencyMatrix(results.rows, n))
+      Post.findAndCountAll({ order: ['postId'] })
+        .then((results) => {
+          // pass results down
+          posts = results.rows;
+          return solver.makeAdjacencyMatrix(results.rows, n);
+        })
+        // M and v are matrices, see mathjs docs
         .then(M => solver.solver(M, 0.8, 0.001))
         .catch(err => cb(err, null)))
-    .then(v => cb(null, v))
+    .then(v =>
+      Promise.all(posts.map(post =>
+        post.updateAttributes({ rank: v.get([post.postId - 1, 0]) })
+      ))
+    )
+    .then(rankedPosts => cb(null, rankedPosts))
     .catch(err => cb(err, null));
 };
 
