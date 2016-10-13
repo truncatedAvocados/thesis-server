@@ -56,4 +56,35 @@ exports.findOne = function(req, res) {
   });
 
 };
+  
+exports.findStats = (req, res) => {
+  var result = {};
+  Post.count().then((postCount) => {
+    result.posts = postCount;
+    return Post.count({ 
+      where: {
+        inLinks: {
+          $ne: []
+        }
+      }
+    }).then((connCount) => {
+      result.connected = connCount;
+      return Authors.count()
+    }).then((authCount) => {
+      result.authors = authCount;
+      res.json(result);
+    });
+  });
+};
 
+exports.findConnected = (req, res) => {
+  Post.findAll({
+    where: {
+      inLinks: {
+        $ne: []
+      }
+    }
+  }).then((connected) => {
+    
+  });
+};

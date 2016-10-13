@@ -20,7 +20,7 @@ module.exports = {
       var workers = numCPUs * 2 < urlList.length ? numCPUs * 2 : urlList.length;
       var urlCount = -1;
       ON_DEATH((signal, err) => {
-        fs.writeFile('queue.json', JSON.stringify(urlList.slice(urlCount)), (err) => {
+        fs.writeFile('crawlerService/queue.json', JSON.stringify(urlList.slice(urlCount)), (err) => {
           if (err) {
             console.log(err);
           }

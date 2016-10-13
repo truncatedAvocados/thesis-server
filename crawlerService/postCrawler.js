@@ -52,7 +52,7 @@ class PostCrawler {
   }
 
   get(cb) {
-    request(this.url, (err, response, body) => {
+    request({ url: this.url, timeout: 10000} , (err, response, body) => {
       if (err) {
         cb(err, null);
       } else {
@@ -244,7 +244,8 @@ class PostCrawler {
         // Remove newline characters and tabs
         .replace(/\r?\n|\r|\t/g, '')
         .trim();
-    this.postInfo.desc = p.slice(0, 200).concat('...');
+    var start = p[0] === '|' ? 1 : 0;
+    this.postInfo.desc = p.slice(start, 200).concat('...');
   }
 }
 
@@ -258,8 +259,9 @@ const addEdge = function(cb, options) {
       cb([]);
     } else {
 
-
-      if (postInfo.desc !== '...' && badTitles.indexOf(postInfo.title) < 0) {
+      // console.log('DESC: ', postInfo.desc);
+      // console.log('TITLE: ', postInfo.title);
+      if (postInfo.desc !== '...' && badTitles.indexOf(postInfo.title) < 0 && postInfo.title.match(/[\S]/)) {
         postUtils.createOneWithEdge(postInfo, crawler.parent, (errEdge, found) => {
           if (errEdge) {
             cb(postInfo.links);
