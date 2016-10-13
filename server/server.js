@@ -3,12 +3,12 @@ var bodyParser = require('body-parser');
 var morgan = require('morgan');
 var routes = require('./router');
 var limiter = require('express-limiter');
-
+var emojiFavicon = require('emoji-favicon');
 // Create the Express application:
 var app = express();
-
 // Attach middleware:
 app.use(bodyParser.json());
+app.use(emojiFavicon('notebook'));
 
 //Common options: 
 // - combined: standard apache with more info
