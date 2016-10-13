@@ -41,7 +41,9 @@ const makeAdjacencyMatrix = (nodes, n) => {
     node.inLinks.forEach((link) => {
       index = [node.postId - 1, node.postId - 1];
       // Add edge
-      G.set([link - 1, node.postId - 1], 1);
+      //G.set([link - 1, node.postId - 1], 1);
+      G.set([node.postId - 1, link - 1], 1);
+
       D.set(index, D.get(index) + 1);
     });
   });

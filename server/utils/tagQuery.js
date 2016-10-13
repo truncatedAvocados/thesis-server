@@ -7,7 +7,7 @@ var stable = require('stable');
 var query = require('../utils/tagQuery.js');
 var _ = require('lodash');
   
-module.exports.sortBy = (a, b) => b.inLinks.length - a.inLinks.length;
+module.exports.sortBy = (a, b) => b.rank - a.rank;
 
 module.exports.query = function(req, res, options) {
   //Send back the total number of results recieved so the client
