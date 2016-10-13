@@ -103,7 +103,10 @@ const rank = (Model, attrs, cb, options) => {
           posts.sort((a, b) => b.rank - a.rank);
 
           const obj = {};
-          attrs.forEach((key) => { obj[key] = attrs[key](posts); });
+          for (var key in attrs) {
+            obj[key] = attrs[key](posts);
+          }
+          
 
           return instance.updateAttributes(obj);
         })
@@ -145,9 +148,12 @@ exports.initRebalance = (cb) => {
   // re-computing PageRank should come first, then re-make the rankings using values from PageRank
 
   pageRank((err, updatedRanks) => {
+  //   console.log(updatedRanks);
     rankAuthors((err, updatedAuthors, time) => {
+      console.log('AUTHORS TIME: ', time);
       // now we have each author and their h-index
       rankPosts((err, updatedTags, time) => {
+        console.log('POSTS TIME: ', time);
         cb();
       });
     });
@@ -156,4 +162,7 @@ exports.initRebalance = (cb) => {
 
 // Export for testing
 module.exports = pageRank;
+this.initRebalance(() => {
+  console.log('Done');
+});
 
