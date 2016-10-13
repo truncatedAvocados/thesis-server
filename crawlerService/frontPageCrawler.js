@@ -45,7 +45,7 @@ module.exports = {
     var count = 0;
 
     var addPosts = (url) => {
-      request({ url: url, timeout: 10000}, (err, res, html) => {
+      request({ url: url }, (err, res, html) => {
         if (err) {
           console.log(err);
         } else {
@@ -69,7 +69,7 @@ module.exports = {
       });
     };
     var addPostsSiteMap = (url) => {
-      request({ url: url, timeout: 10000}, (err, res, xml) => {
+      request({ url: url }, (err, res, xml) => {
         if (err) {
           console.log(err);
         } else {
@@ -96,10 +96,11 @@ module.exports = {
     urlList.forEach((urlObj) => {
       //No need to check both if it's in the whitelist now,
       //just if it has a sitemap
-      if (urlObj.siteMap) {
-        addPostsSiteMap(urlObj.siteMap);
+      var url = Object.keys(urlObj)[0];
+      if (urlObj[url].siteMap) {
+        addPostsSiteMap(urlObj[url].siteMap);
       } else {
-        addPosts(Object.keys(urlObj)[0]);
+        addPosts(url);
       }
     });
   },

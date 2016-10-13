@@ -16,7 +16,6 @@ const start = () => {
   wl.findAll((err, allLists) => {
 
     if (!err) {
-
       //process lists
       var base = {};
       allLists
