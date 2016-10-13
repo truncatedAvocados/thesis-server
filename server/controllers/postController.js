@@ -6,6 +6,7 @@ var Promise = require('bluebird');
 var stable = require('stable');
 var query = require('../utils/tagQuery.js').query;
 var sortBy = require('../utils/tagQuery.js').sortBy;
+var fs = require('fs');
 
 
 //Finds one all posts matching a tag, sorting them by inLinks
@@ -77,14 +78,31 @@ exports.findStats = (req, res) => {
   });
 };
 
-exports.findConnected = (req, res) => {
+exports.findConnected = (cb) => {
   Post.findAll({
     where: {
       inLinks: {
         $ne: []
       }
     }
-  }).then((connected) => {
-    
+  }).then((results) => {
+    var connected = results.map((item) => {
+      return {
+        title: item.dataValues.title,
+        postId: item.dataValues.postId,
+        inLinks: item.dataValues.inLinks,
+        rank: item.dataValues.rank
+      }
+    });
+    cb(connected);
   });
 };
+
+//Uncomment to write graph to JSON in thesis-client
+// this.findConnected((connected) => {
+//   fs.writeFile('./thesis-client/Public/App/Assets/graph.json', JSON.stringify(connected), (err) => {
+//     if (err) {
+//       throw err;
+//     }
+//   });
+// });

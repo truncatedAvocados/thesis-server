@@ -28,7 +28,7 @@ router.get('/authors/:number', function(req, res) {
   authController.findOne(req, res);
 });
 
-router.get('/statistics', function(req, res) {
+router.get('/stats', function(req, res) {
   console.log('GET statistics');
   postController.findStats(req, res);
 });
