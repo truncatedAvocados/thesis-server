@@ -139,6 +139,5 @@ const start = () => {
   });
 };
 
-start();
 module.exports = start;
 

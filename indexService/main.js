@@ -162,7 +162,4 @@ exports.initRebalance = (cb) => {
 
 // Export for testing
 module.exports = pageRank;
-this.initRebalance(() => {
-  console.log('Done');
-});
 
