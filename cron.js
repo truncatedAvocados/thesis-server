@@ -1,6 +1,7 @@
 const CronJob = require('cron').CronJob;
-const startCrawlers = require('./crawlerService/startCrawlers');
-const startIndex = require('./indexService/main').initRebalance;
+// const startCrawlers = require('./crawlerService/startCrawlers');
+// const startIndex = require('./indexService/main').initRebalance;
+
 let job;
 //Potential to give these guys callbacks that write some process information here and write it to a log file
 if (process.argv.indexOf('--crawl') > -1) {
@@ -16,9 +17,15 @@ if (process.argv.indexOf('--crawl') > -1) {
     cronTime: '00 00 22 * * 0-6',
     onTick: () => { startIndex(); },
     start: false,
-    timeZone: 'America/Los_Angeles' });  
+    timeZone: 'America/Los_Angeles' });
+} else {
+  job = new CronJob({
+    // Start the INDEX everyday at 10:00:00 PM
+    cronTime: '30 * * * * *',
+    onTick: () => { console.log('Hello world!'); },
+    start: false,
+    timeZone: 'America/Los_Angeles' });
 }
-
 console.log(job);
-
 job.start();
+
