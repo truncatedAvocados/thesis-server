@@ -1,4 +1,4 @@
-# Blog Rank
+# BlogRank
 
 BlogRank is your go-to source for discovering programming knowledge from bloggers. Independent bloggers power the world of development, often-times disseminating the best new ideas, practices, and even novel language contructs that the creators of a technology didn't even think of. The core idea of BlogRank is that the articles you want to see most are the ones vetted by other independent bloggers. The more highly cited a blog post is by other authors, the more highly we rank it. You can also search by author who are ranked according to their h-index, as inspired by the world of academia.
 
@@ -20,7 +20,6 @@ Our search engine is powered by the graph data structure you see visualized in t
     1. [Client-side](#client-side)
     1. [Worker Service and Index Service](#worker-service-and-index-service)
     1. [Roadmap](#roadmap)
-1. [Team](#team)
 1. [Contributing](#contributing)
 
 ## Usage
