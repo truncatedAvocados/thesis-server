@@ -21,6 +21,7 @@ Our search engine is powered by the graph data structure you see visualized in t
     1. [Worker Service and Index Service](#worker-service-and-index-service)
     1. [Roadmap](#roadmap)
 1. [Contributing](#contributing)
+1. [API](#API)
 
 ## Usage
 
@@ -76,3 +77,179 @@ View the project roadmap [here](LINK_TO_PROJECT_ISSUES)
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
+
+
+## API
+
+###**Search Posts or Authors**###
+----
+  Fetches an array of posts or authors that best match the provided tags and page number. Also returns a count of the total number of matching posts or authors in our database.
+
+* **URL**
+
+  /api/posts or /api/authors
+
+* **Method:**
+
+  `GET`
+  
+*  **URL Params**
+
+   **Required:**
+ 
+   `tags=[string]`
+   example: tags=["javascript", "node"]
+
+   **Optional:**
+ 
+   `page=number`
+   default=1
+
+* **Post Response:**
+
+  * **Code:** 200 <br />
+    **Content:** 
+~~~
+    {
+      "results": [
+        {
+          "url": ...,
+          "postId": ...,
+          "inLinks": [
+            ...
+          ],
+          "title": ...,
+          "oldTags": [
+            ...
+          ],
+          "author": ...,
+          "publishDate": ...,
+          "rank": ...,
+          "createdAt": ...,
+          "updatedAt": ...
+        },
+        ...
+      ],
+      "count": ...
+    }
+
+~~~
+
+* **Author Response:**
+
+  * **Code:** 200 <br />
+    **Content:** 
+~~~
+    {
+      "results": [
+        {
+          "id": ...,
+          "name": ...,
+          "hIndex": ...,
+          "createdAt": ...,
+          "updatedAt": ...,
+          "posts": [
+            ...
+          ]
+        },
+        ...
+      ],
+      "count": ...
+    }
+
+~~~
+
+* **Sample Call:**
+~~~
+  $.ajax({
+    url: blogrank.io/api/posts?tags=["javascript"]&page=2,
+    method: 'GET',
+    success: data => console.log(data);
+  });
+~~~
+
+###**Fetch Post Inlinks**###
+----
+  Fetches an array of posts that link to the post with the sent in Id.
+
+* **URL**
+
+  /api/posts/:id
+
+* **Method:**
+
+  `GET`
+  
+*  **URL Params**
+
+   **Required:**
+ 
+   `id=number`
+
+* **Response:**
+
+  * **Code:** 200 <br />
+    **Content:** 
+~~~
+      [
+        {
+          "url": ...,
+          "postId": ...,
+          "inLinks": [
+            ...
+          ],
+          "title": ...,
+          "oldTags": [
+            ...
+          ],
+          "author": ...,
+          "publishDate": ...,
+          "rank": ...,
+          "createdAt": ...,
+          "updatedAt": ...
+        },
+        ...
+      ]
+
+~~~
+* **Sample Call:**
+~~~
+  $.ajax({
+    url: blogrank.io/api/posts/22882,
+    method: 'GET',
+    success: data => console.log(data);
+  });
+~~~
+
+###**Get Database Statistics**###
+----
+  Returns a JSON object with database statistics.
+
+* **URL**
+
+  /api/stats
+
+* **Method:**
+
+  `GET`
+
+* **Response:**
+
+  * **Code:** 200 <br />
+    **Content:** 
+~~~
+      {
+        "posts": ...,
+        "connected": ...,
+        "authors": ...
+      }
+
+~~~
+* **Sample Call:**
+~~~
+  $.ajax({
+    url: blogrank.io/api/stats,
+    method: 'GET',
+    success: data => console.log(data);
+  });
+~~~
