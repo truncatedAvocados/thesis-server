@@ -1,30 +1,5 @@
 # Contributing
 
-## General Workflow
-
-1. Fork the repo
-1. Cut a namespaced feature branch from master
-  - bug/...
-  - feat/...
-  - test/...
-  - doc/...
-  - refactor/...
-1. Make commits to your feature branch. Prefix each commit like so:
-  - (feat) Added a new feature
-  - (fix) Fixed inconsistent tests [Fixes #0]
-  - (refactor) ...
-  - (cleanup) ...
-  - (test) ...
-  - (doc) ...
-1. When you've finished with your fix or feature, `rebase` upstream changes into your branch and submit a pull request directly to master. Include a description of your changes.
-1. Your pull request will be reviewed by another maintainer. If your code reviewer
-   requests you make a change you don't understand, ask them why.
-1. Fix any issues raised by your code reviwer, and push your fixes as a single
-   new commit.
-1. Once the pull request has been reviewed, it will be merged by another member of the team. **Do not merge your own commits!**
-
-A visual representation of this general workflow can be found [here][workflow diagram].
-
 ## Using the Production Environment
 
 ### Accessing the Amazon RDS
@@ -69,6 +44,31 @@ deploy
 ```
 
 That's it! Deploy is an alias in the EC2 image and will begin the server in the background with `nohup`, as well as performing concatenation and minification of client files.
+
+## General Workflow
+
+1. Fork the repo
+1. Cut a namespaced feature branch from master
+  - bug/...
+  - feat/...
+  - test/...
+  - doc/...
+  - refactor/...
+1. Make commits to your feature branch. Prefix each commit like so:
+  - (feat) Added a new feature
+  - (fix) Fixed inconsistent tests [Fixes #0]
+  - (refactor) ...
+  - (cleanup) ...
+  - (test) ...
+  - (doc) ...
+1. When you've finished with your fix or feature, `rebase` upstream changes into your branch and submit a pull request directly to master. Include a description of your changes.
+1. Your pull request will be reviewed by another maintainer. If your code reviewer
+   requests you make a change you don't understand, ask them why.
+1. Fix any issues raised by your code reviwer, and push your fixes as a single
+   new commit.
+1. Once the pull request has been reviewed, it will be merged by another member of the team. **Do not merge your own commits!**
+
+A visual representation of this general workflow can be found [here][workflow diagram].
 
 ## Detailed Workflow
 
