@@ -32,7 +32,7 @@ const start = () => {
         });
 
       var whitelist = allLists
-                  .filter(item => !item.base)
+                  .filter(item => !item.base && !item.bad)
                   .map(item => {
                     var obj = {};
                     obj[item.url] = {
